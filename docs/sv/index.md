@@ -9,6 +9,7 @@
 <div class="grid cards" markdown>
 
 - ## Digitala arbetsflöden för forskning
+    - [Intervjustudier](methodologies/interview-practices.md)
     - [Från planering till publicering](methodologies/research-data-lifecycle.md)
     - [Metoder för öppenhet och transparens](methodologies/openness.md)
     - [Konfidentiella data -god praxis](methodologies/confidential-data.md)

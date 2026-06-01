@@ -14,6 +14,7 @@ The TOC appear to rest on shaky foundations...
 <div class="grid cards" markdown>
 
 - ## Digital research workflows
+    - [Conducting interview studies](methodologies/interview-practices.md)
     - [From plan to publish](methodologies/research-data-lifecycle.md)
     - [Methods for openness and transparency](methodologies/openness.md)
     - [Confidential data - good practices](methodologies/confidential-data.md)
@@ -23,7 +24,8 @@ The TOC appear to rest on shaky foundations...
     - [Data-driven research methodologies](methodologies/data-science.md)
     - [Automated Workflows](methodologies/workflows.md)
 
-- ## How to
+- ## Get started with
+    - [Recording and transcribing interviews](how_to_guides/record-transcribe-interviews.md)
     - [Contribute to this workspace](how_to_guides/contribute.md)
     - [Access Jupyter notebooks at EOSC EU node](how_to_guides/EOSC_Jupyter.md)
 
