@@ -2,7 +2,10 @@ site_name: Workspace KTH Digital Research Collaborative Hub v0.1
 # it does not matter that this hostname does not match the staging server, but
 # please do not set a path (the part after the slash) because that seems to
 # break the staging site's Swedish pages (but not the English, curiously)
-site_url: https://kth-library.github.io
+# NOTE! The folder name in site_url must match the name of the repo (obviously)!
+# To avoid breaking either staging or master, we must ensure that the staging site
+# follows the same relative path!
+site_url: https://kth-library.github.io/kth-digital-research-handbook
 repo_url: https://github.com/KTH-Library/kth-digital-research-handbook
 repo_name: KTH digital research handbook
 copyright: '© 2026 KTH Royal Institute of Technology'
