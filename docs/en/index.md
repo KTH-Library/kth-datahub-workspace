@@ -1,7 +1,7 @@
 # <!-- markdownlint-disable MD007 -->
 
 !!! warning "Site under construction"
-    This site is a work in progress. Found a mistake? Please [let us know](about/contact-us.md)!
+    This site is a work in progress. [Contributions are welcome!](how_to_guides/contribute.md) Found a mistake? Please [let us know](about/contact-us.md).
 
 <!-- NOTE
 Each item in the list (inside the div) below gets an entry in the main TOC, but so does
@@ -27,6 +27,7 @@ The TOC appear to rest on shaky foundations...
 - ## Get started with
     - [Recording and transcribing interviews](how_to_guides/record-transcribe-interviews.md)
     - [Contributing to this workspace!](how_to_guides/contribute.md)
+    - [Digital Europe Multilingual Services](how_to_guides/eu-multilingual-services.md)
     - [Access Jupyter notebooks at EOSC EU node](how_to_guides/EOSC_Jupyter.md)
 
 - ## Knowledge base

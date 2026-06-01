@@ -2,7 +2,7 @@
 # <!-- markdownlint-disable MD007 -->
 
 !!! warning "Webbplatsen är under uppbyggnad"
-    Arbete pågår! Tveka inte [att höra av dig](about/contact-us.md) om du hittat ett misstag.
+    Arbete pågår. [Arbetsytan är öppen för dina bidrag](how_to_guides/contribute.md), stora som små! [Kontakta oss gärna](about/contact-us.md) med frågor, förslag eller felrapporter.
 
 ## Guide till goda digitala forskningsmetoder vid KTH v0.1
 
@@ -20,7 +20,9 @@
     - [Automatiserade arbetsflöden](methodologies/workflows.md)
 
 - ## Hur gör jag för att
+    - [Recording and transcribing interviews](how_to_guides/record-transcribe-interviews.md)
     - [Bidra till denna arbetsyta](how_to_guides/contribute.md)
+    - [Digital Europe Multilingual Services](how_to_guides/eu-multilingual-services.md)
     - [komma åt resurser inom EOSC](how_to_guides/EOSC_Jupyter.md)
 
 - ## Kunskapsbas

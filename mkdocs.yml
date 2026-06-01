@@ -108,6 +108,7 @@ plugins:
             - Hur gör jag för att:
                 - Record and transcribe interviews: how_to_guides/record-transcribe-interviews.md
                 - Bidra till denna arbetsyta: how_to_guides/contribute.md
+                - Digital Europe Multilingual Services: how_to_guides/eu-multilingual-services.md
                 - Komma åt Jupyter vid EOSC EU-noden: how_to_guides/EOSC_Jupyter.md
             - Kunskapsbas:
                 - KTH-stöd: knowledge_base/kth-support.md
@@ -142,6 +143,7 @@ nav:
   - How to:
       - Record and transcribe interviews: how_to_guides/record-transcribe-interviews.md
       - Contribute to this workspace: how_to_guides/contribute.md
+      - Digital Europe Multilingual Services: how_to_guides/eu-multilingual-services.md
       - Access Jupyter notebook at EOSC EU node: how_to_guides/EOSC_Jupyter.md
   - Knowledge base:
       - KTH support: knowledge_base/kth-support.md
