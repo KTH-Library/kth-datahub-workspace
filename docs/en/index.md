@@ -25,7 +25,6 @@ The TOC appear to rest on shaky foundations...
     - [Automated Workflows](methodologies/workflows.md)
 
 - ## Get started with
-    - [Recording and transcribing interviews](how_to_guides/record-transcribe-interviews.md)
     - [Contribute to this workspace](how_to_guides/contribute.md)
     - [Access Jupyter notebooks at EOSC EU node](how_to_guides/EOSC_Jupyter.md)
 
