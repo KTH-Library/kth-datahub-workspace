@@ -74,9 +74,7 @@ so please pick and choose the items that are helpful to you.
 + **Train co-investigators** - This step is relevant if you are more than one person
   performing interviews in the research setting.
 + **Check settings and test tools** - See
-[//]: # (TO-DO this link goes to a Confluence page, it too needs to be added to the Workspace)
-[//]: # (https://confluence.sys.kth.se/confluence/spaces/FOR/pages/299896981/How+to+record+and+transcribe+interviews)
-  the practical guides on how to record interviews.
+  [the practical guides on how to record interviews](../how_to_guides/record-transcribe-interviews.md).
 
 ### Perform interviews
 
@@ -89,9 +87,7 @@ so please pick and choose the items that are helpful to you.
 ### Transcribe and prepare data
 
 + **Run transcription** - See
-[//]: # (TO-DO same link as above, to Confluence page, its content should be added to Workspace)
-[//]: # (https://confluence.sys.kth.se/confluence/spaces/FOR/pages/299896981/How+to+record+and+transcribe+interviews)
-  the practical guides for how to do it.
+  [the practical guides for how to do it](../how_to_guides/record-transcribe-interviews.md).
 + **Prepare transcripts for use**.
 + **Save code key in a safe place separate from the transcripts and media files**.
 
@@ -187,4 +183,4 @@ As we have seen, different tools & approaches have different pros and cons.
 [//]: # (TO-DO same link as above, to Confluence page, its content should be added to Workspace)
 [//]: # (https://confluence.sys.kth.se/confluence/spaces/FOR/pages/299896981/How+to+record+and+transcribe+interviews)
 For practical how-to guides on how you can perform such a workflow - look at the
-how-to guides for using KTH digital tools for recording and transcribing.
+[how-to guide for using KTH digital tools for recording and transcribing](../how_to_guides/record-transcribe-interviews.md).
