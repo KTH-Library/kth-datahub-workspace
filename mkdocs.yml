@@ -139,8 +139,9 @@ nav:
       - Do data-driven science: methodologies/data-science.md
       - Use automated workflows: methodologies/workflows.md
   - How to:
-      - Access Jupyter notebook at EOSC EU node: how_to_guides/EOSC_Jupyter.md
+      - Record and transcribe interviews: how_to_guides/record-transcribe-interviews.md
       - Contribute to this workspace: how_to_guides/contribute.md
+      - Access Jupyter notebook at EOSC EU node: how_to_guides/EOSC_Jupyter.md
   - Knowledge base:
       - KTH support: knowledge_base/kth-support.md
       - Communities: knowledge_base/communities.md

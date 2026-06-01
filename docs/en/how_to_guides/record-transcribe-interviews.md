@@ -2,7 +2,7 @@
 
 [//]: # (https://confluence.sys.kth.se/confluence/x/lRDgEQ)
 
-This guide is a complement to the [Interview studies: good research data management practices](../../methodologies/interview-practices)
+This guide is a complement to the [Interview studies: good research data management practices](../../methodologies/interview-practices.md)
 article, which you might want to read first.
 
 On this page you can find practical guides for recording and transcribing using
