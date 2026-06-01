@@ -106,8 +106,9 @@ plugins:
                 - Arbeta med data-drivna metoder: methodologies/data-science.md
                 - Använda automatiserade arbetsflöden: methodologies/workflows.md
             - Hur gör jag för att:
-                - Komma åt Jupyter vid EOSC EU-noden: how_to_guides/EOSC_Jupyter.md
+                - Record and transcribe interviews: how_to_guides/record-transcribe-interviews.md
                 - Bidra till denna arbetsyta: how_to_guides/contribute.md
+                - Komma åt Jupyter vid EOSC EU-noden: how_to_guides/EOSC_Jupyter.md
             - Kunskapsbas:
                 - KTH-stöd: knowledge_base/kth-support.md
                 - Communities: knowledge_base/communities.md
