@@ -5,8 +5,8 @@ site_name: Workspace KTH Digital Research Collaborative Hub v0.1
 # NOTE! The folder name in site_url must match the name of the repo (obviously)!
 # To avoid breaking either staging or master, we must ensure that the staging site
 # follows the same relative path!
-site_url: https://kth-library.github.io/kth-digital-research-handbook
-repo_url: https://github.com/KTH-Library/kth-digital-research-handbook
+site_url: https://kth-library.github.io/kth-datahub-workspace
+repo_url: https://github.com/KTH-Library/kth-datahub-workspace
 repo_name: KTH digital research handbook
 copyright: '© 2026 KTH Royal Institute of Technology'
 
@@ -59,7 +59,7 @@ extra:
   generator: false
   social:
     - icon: simple/github
-      link: https://github.com/KTH-Library/kth-digital-research-handbook
+      link: https://kth-library.github.io/kth-datahub-workspace
 validation:
 # https://www.mkdocs.org/user-guide/configuration/#validation
   omitted_files: warn
