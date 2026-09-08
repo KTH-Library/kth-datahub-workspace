@@ -1,0 +1,14 @@
+
+:root {
+/* I tested various colours from this palette
+https://github.com/KTH-Library/ktheme#standard-kth-palette
+until I found one that 1) differs from the KTH Data Repository Guide, and
+2) offers good contrast to text and background */
+/* --md-primary-fg-color:        #FFBE00; this yellow colour has bad contrast in headers, and links are this same colour (too light) */
+--md-primary-fg-color:        #3F824E;
+}
+
+/* Override link color in dark mode */
+[data-md-color-scheme="slate"] {
+    --md-typeset-a-color: rgb(255, 255, 255);
+  }
