@@ -1,13 +1,12 @@
 site_name: Workspace KTH Digital Research Collaborative Hub v0.1
-# it does not matter that this hostname does not match the staging server, but
-# please do not set a path (the part after the slash) because that seems to
-# break the staging site's Swedish pages (but not the English, curiously)
 # NOTE! The folder name in site_url must match the name of the repo (obviously)!
 # To avoid breaking either staging or master, we must ensure that the staging site
 # follows the same relative path!
 site_url: https://kth-library.github.io/kth-datahub-workspace
 repo_url: https://github.com/KTH-Library/kth-datahub-workspace
-repo_name: KTH digital research handbook
+# this is used in the header as the link to the Github repo (immediately above
+# the star and fork counts)
+repo_name: kth-datahub-workspace
 copyright: '© 2026 KTH Royal Institute of Technology'
 
 extra_css:
