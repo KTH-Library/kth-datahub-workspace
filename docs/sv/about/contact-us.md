@@ -1,4 +1,4 @@
-# Contact
+# Kontakta oss
 
 Mejla [datahub-info@kth.se](mailto:datahub-info@kth.se) dina bidrag, frågor eller förslag!
 
