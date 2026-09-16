@@ -1,0 +1,24 @@
+export VIRTUAL_ENV=.venv
+layout python3
+
+# this stuff only bothers me - by simply checking username we should avoid bothering
+# any other user who happens to enable this environment without reading it first...
+if [[ "$(whoami)" == "taha" ]]; then
+   # when working from BAY (so on asks2, luxor, or rosetta) the UV cache directory
+   # lives on a different filesystem as evidenced by "uv run..." showing errors
+   # about broken hardlinks etc.
+   # https://github.com/astral-sh/uv/issues/7285
+   # You should therefore primarily work on this project from kthb374!
+   # But it would still be nice to be able to work on this project from
+   # other workstations, so in that interest, let's try this hacky work-around:
+   if [[ "$(hostname)" == "kthb374" ]]; then
+      export UV_CACHE_DIR=$HOME/.cache/uv
+      export UV_LINK_MODE=symlink
+   else
+      # else we can assume we are working with BAY
+      # I'm not sure what's best - keep cache on same filesystem but suffer slower speed,
+      # put cache on SSD but at the cost of no symlinks?
+      export UV_CACHE_DIR=/media/bay/taha/local/cache/uv
+      export UV_LINK_MODE=symlink
+   fi
+fi
