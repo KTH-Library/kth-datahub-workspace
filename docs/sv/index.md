@@ -29,7 +29,7 @@
     - [KTH-support](knowledge_base/kth-support.md)
     - [Communities](knowledge_base/communities.md)
     - [Hitta data](knowledge_base/finding-data.md)
-    - [Hitta digitala tjänster](knowledge_base/tools.md)
+    - [Hitta digitala tjänster](services/index.md)
     - [Lagring och beräkning](knowledge_base/storage.md)
     - [Nationella resurser](knowledge_base/national.md)
     - [Översikt regulatoriska krav](knowledge_base/regulation.md)

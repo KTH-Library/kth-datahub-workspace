@@ -1,7 +1,7 @@
 [project]
-name = "kth-datahub-workspace"
+name = "kth-digital-research-handbook"
 version = "0.1.0"
-description = "Workspace KTH Digital Research Collaborative Hub"
+description = "KTH Digital Research Handbook"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [

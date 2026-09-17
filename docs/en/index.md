@@ -34,7 +34,7 @@ The TOC appear to rest on shaky foundations...
     - [KTH support](knowledge_base/kth-support.md)
     - [Communities](knowledge_base/communities.md)
     - [Access data](knowledge_base/finding-data.md)
-    - [Find digital services](knowledge_base/tools.md)
+    - [Find digital services](services/index.md)
     - [Access storage and compute resources](knowledge_base/storage.md)
     - [National infrastructure for research](knowledge_base/national.md)
     - [Regulatory overview](knowledge_base/regulation.md)
