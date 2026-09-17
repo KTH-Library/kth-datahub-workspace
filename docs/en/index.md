@@ -1,7 +1,8 @@
 # <!-- markdownlint-disable MD007 -->
 
-!!! warning "Site under construction"
-    This site is a work in progress. [Contributions are welcome!](how_to_guides/contribute.md) Found a mistake? Please [let us know](about/contact-us.md).
+!!! warning "This is a prototype website under active construction"
+    This site is a work in progress. [Contributions are welcome!](how_to_guides/contribute.md)  
+    Found a mistake or need definitive and reliable advice? [Contact us!](about/contact-us.md).
 
 <!-- NOTE
 Each item in the list (inside the div) below gets an entry in the main TOC, but so does

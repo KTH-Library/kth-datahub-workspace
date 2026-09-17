@@ -1,8 +1,9 @@
 
 # <!-- markdownlint-disable MD007 -->
 
-!!! warning "Webbplatsen är under uppbyggnad"
-    Arbete pågår. [Arbetsytan är öppen för dina bidrag](how_to_guides/contribute.md), stora som små! [Kontakta oss gärna](about/contact-us.md) med frågor, förslag eller felrapporter.
+!!! warning "Detta är en prototyp-webbplats under aktiv uppbyggnad"
+    Arbete pågår. [Arbetsytan är öppen för dina bidrag](how_to_guides/contribute.md), stora som små!  
+    [Kontakta oss gärna](about/contact-us.md) med frågor, förslag eller felrapporter.
 
 ## Guide till goda digitala forskningsmetoder vid KTH v0.1
 
