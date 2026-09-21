@@ -1,4 +1,4 @@
-# Digital Tools overview
+# Digital services overview
 
 An overview of digital services that researchers at KTH can use for storing,
 computing on, sharing and publishing research material. Search freely, filter by
