@@ -1,0 +1,326 @@
+/* ==========================================================================
+   Digital service catalogue — cards, filters, tags and modal
+   --------------------------------------------------------------------------
+   Loaded through `extra_css` in mkdocs.yml. The class names here are a
+   contract with two other files and must not be renamed in isolation:
+     * service_catalog/hooks/services.py  — generates the markup
+     * docs/javascripts/service_catalog/services.js — toggles state
+
+   Colours come from Material's CSS variables wherever possible so the page
+   follows the site's light/dark palette. The few literal colours are the tag
+   families, which need distinct hues; each has a slate (dark mode) override
+   below to keep text contrast readable.
+   ========================================================================== */
+
+/* --- Filter bar ---------------------------------------------------------- */
+
+.svc-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .6rem;
+  margin: 1.2rem 0 .6rem;
+}
+
+.svc-filters input[type="search"] {
+  flex: 1 1 16rem;
+}
+
+.svc-filters input,
+.svc-filters select,
+.svc-filters button {
+  font: inherit;
+  padding: .45rem .6rem;
+  border: 1px solid var(--md-default-fg-color--lighter);
+  border-radius: .3rem;
+  background: var(--md-default-bg-color);
+  color: var(--md-default-fg-color);
+}
+
+.svc-filters select {
+  cursor: pointer;
+}
+
+/* Hover/focus feedback: the controls are plain HTML elements, so without this
+   they give no indication of being interactive in the Material theme. */
+.svc-filters input:hover,
+.svc-filters select:hover {
+  border-color: var(--md-accent-fg-color);
+}
+
+.svc-filters input:focus-visible,
+.svc-filters select:focus-visible,
+.svc-filters button:focus-visible,
+.svc-card__open:focus-visible,
+.svc-tag:focus-visible,
+.svc-btn:focus-visible,
+.svc-modal__close:focus-visible {
+  outline: 2px solid var(--md-accent-fg-color);
+  outline-offset: 2px;
+}
+
+.svc-filters__reset:not(:disabled) {
+  cursor: pointer;
+  border-color: var(--md-accent-fg-color);
+  color: var(--md-accent-fg-color);
+}
+
+.svc-filters__reset:not(:disabled):hover {
+  background: var(--md-accent-fg-color);
+  color: var(--md-accent-bg-color, #fff);
+}
+
+/* Disabled means "nothing to clear"; dimming alone is enough because the
+   button is also `disabled` and therefore skipped by assistive tech. */
+.svc-filters__reset:disabled {
+  opacity: .5;
+}
+
+.svc-count {
+  font-size: .75rem;
+  color: var(--md-default-fg-color--light);
+  margin: 0 0 1rem;
+}
+
+/* --- Card grid ----------------------------------------------------------- */
+
+.svc-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr));
+  gap: 1rem;
+}
+
+.svc-card[hidden] {
+  display: none !important;
+}
+
+.svc-card {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--md-default-fg-color--lightest);
+  border-radius: .4rem;
+  background: var(--md-default-bg-color);
+  transition: border-color .15s, box-shadow .15s;
+}
+
+/* IMPORTANT — do not remove.
+   The script hides non-matching cards by setting the `hidden` attribute. The
+   browser's built-in rule for `[hidden]` is `display: none`, but it has lower
+   specificity than the `.svc-card { display: flex }` rule above, so without
+   this override every card stays visible while the counter says otherwise.
+   That was the original filtering bug. Any new rule that sets `display` on a
+   hideable element needs the same companion rule (see `.svc-modal[hidden]`). */
+.svc-card[hidden] {
+  display: none;
+}
+
+.svc-card:hover {
+  border-color: var(--md-accent-fg-color);
+  box-shadow: 0 .15rem .6rem rgba(0, 0, 0, .12);
+}
+
+/* The whole upper part of a card is one button, so a click anywhere on the
+   title, provider or summary opens the modal. */
+.svc-card__open {
+  display: block;
+  flex: 1;
+  text-align: left;
+  cursor: pointer;
+  padding: 1rem 1rem .4rem;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+}
+
+.svc-icon svg {
+  width: 1.6rem;
+  height: 1.6rem;
+  fill: currentColor;
+}
+
+.svc-card__icon {
+  display: block;
+  color: var(--md-accent-fg-color);
+}
+
+.svc-card__title {
+  display: block;
+  font-weight: 700;
+  margin: .4rem 0 .1rem;
+}
+
+.svc-card__provider {
+  display: block;
+  font-size: .7rem;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  color: var(--md-default-fg-color--light);
+}
+
+.svc-card__summary {
+  display: block;
+  margin-top: .5rem;
+  font-size: .78rem;
+  line-height: 1.5;
+  color: var(--md-default-fg-color--light);
+}
+
+/* --- Tags ---------------------------------------------------------------- */
+
+.svc-card__tags,
+.svc-modal__tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .3rem;
+  padding: .4rem 1rem 1rem;
+}
+
+.svc-modal__tags {
+  padding: .2rem 0 1rem;
+}
+
+.svc-tag {
+  cursor: pointer;
+  font: inherit;
+  font-size: .65rem;
+  line-height: 1;
+  padding: .3rem .5rem;
+  border-radius: 1rem;
+  border: 1px solid transparent;
+}
+
+.svc-tag:hover {
+  filter: brightness(1.08);
+  text-decoration: underline;
+}
+
+/* One hue per tag family; the suffix matches TAG_GROUPS in services.py. */
+.svc-tag--provider { background: #1b5e9a1a; border-color: #1b5e9a66; color: #14507f; }
+.svc-tag--group    { background: #0b7a5c1a; border-color: #0b7a5c66; color: #07604a; }
+.svc-tag--type     { background: #7b3fa01a; border-color: #7b3fa066; color: #67338a; }
+.svc-tag--data     { background: #a8570a1a; border-color: #a8570a66; color: #8a4708; }
+.svc-tag--location { background: #4a4a4a1a; border-color: #4a4a4a66; color: #3d3d3d; }
+
+/* Dark mode: the light-mode hues fall below 4.5:1 on the slate background, so
+   each family gets a lighter variant instead. */
+[data-md-color-scheme="slate"] .svc-tag--provider { color: #9ecbf0; }
+[data-md-color-scheme="slate"] .svc-tag--group    { color: #86d8be; }
+[data-md-color-scheme="slate"] .svc-tag--type     { color: #cfb0ea; }
+[data-md-color-scheme="slate"] .svc-tag--data     { color: #ecc188; }
+[data-md-color-scheme="slate"] .svc-tag--location { color: #cfcfcf; }
+
+/* Missing information is shown, never hidden — see MISSING in services.py. */
+.svc-missing {
+  color: #8a4708;
+  font-style: italic;
+}
+
+[data-md-color-scheme="slate"] .svc-missing { color: #ecc188; }
+
+/* --- Modal --------------------------------------------------------------- */
+
+/* Same specificity fix as `.svc-card[hidden]` above: the modal sets
+   `display: flex`, so the built-in `[hidden]` rule needs to be restated. */
+.svc-modal[hidden] { display: none; }
+
+.svc-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 3vh 1rem;
+  overflow-y: auto;
+}
+
+.svc-modal__backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, .55);
+}
+
+.svc-modal__panel {
+  position: relative;
+  width: min(42rem, 100%);
+  background: var(--md-default-bg-color);
+  border-radius: .5rem;
+  padding: 1.6rem;
+  box-shadow: 0 1rem 2rem rgba(0, 0, 0, .3);
+}
+
+.svc-modal__close {
+  position: absolute;
+  top: .4rem;
+  right: .6rem;
+  font-size: 1.6rem;
+  line-height: 1;
+  background: none;
+  border: 0;
+  cursor: pointer;
+  color: var(--md-default-fg-color--light);
+}
+
+.svc-modal__close:hover { color: var(--md-accent-fg-color); }
+
+.svc-modal__icon { color: var(--md-accent-fg-color); margin: 0; }
+.svc-modal__title { margin: .2rem 0 .1rem; }
+
+.svc-modal__provider {
+  margin: 0;
+  font-size: .7rem;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  color: var(--md-default-fg-color--light);
+}
+
+.svc-modal__summary { margin: .6rem 0 .4rem; }
+
+/* Sections are native <details>, so they work without JavaScript. */
+.svc-section {
+  border-top: 1px solid var(--md-default-fg-color--lightest);
+}
+
+.svc-section > summary {
+  cursor: pointer;
+  padding: .6rem 0;
+  font-weight: 700;
+}
+
+.svc-section__body { padding-bottom: .6rem; font-size: .8rem; }
+
+/* --- Buttons and footer -------------------------------------------------- */
+
+.svc-modal__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .6rem;
+  margin-top: 1.2rem;
+}
+
+.svc-btn {
+  display: inline-block;
+  padding: .45rem .8rem;
+  border-radius: .3rem;
+  border: 1px solid var(--md-accent-fg-color);
+  color: var(--md-accent-fg-color);
+  font-size: .78rem;
+  text-decoration: none;
+}
+
+.svc-btn:hover {
+  background: var(--md-accent-fg-color);
+  color: var(--md-accent-bg-color, #fff);
+}
+
+.svc-btn--primary {
+  background: var(--md-accent-fg-color);
+  color: var(--md-accent-bg-color, #fff);
+}
+
+.svc-btn--primary:hover {
+  filter: brightness(1.08);
+}
+
+/* Prevents the page behind an open modal from scrolling. */
+body.svc-modal-open { overflow: hidden; }
