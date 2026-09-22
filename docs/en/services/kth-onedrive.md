@@ -11,6 +11,14 @@ access: Available to all staff and students with a KTH account.
 link: https://intra.kth.se/it/lagring
 link_requires_login: false
 ---
+rating:
+  legal: green
+  ip: green
+  security: green
+  cost: green
+  support: green
+
+
 
 ## Access
 
