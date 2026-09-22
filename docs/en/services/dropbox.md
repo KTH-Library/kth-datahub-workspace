@@ -10,14 +10,14 @@ summary: Commercial file sync and sharing, common in external collaborations but
 access: Personal or project-funded subscription; no KTH-wide agreement.
 link: https://www.dropbox.com
 link_requires_login: false
----
+
 rating:
   legal: red
   ip: yellow
   security: red
   cost: yellow
   support: yellow
-
+---
 
 ## Access
 
