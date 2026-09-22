@@ -12,11 +12,21 @@ link: https://github.com/KTH-Library
 link_requires_login: false
 
 rating:
-  legal: yellow
-  ip: yellow
-  security: green
+  legal:
+    status: yellow
+    note: "Suitable for open-source code and collaboration. Should not be used for classified information or sensitive personal data."
+
+  ip:
+    status: yellow
+    note: "Requires awareness of the selected licence and the rights of external contributors."
+
+  security:
+    status: green
+    note: "Supports two-factor authentication (2FA) and KTH SSO through GitHub Enterprise."
+
   cost: green
   support: yellow
+
 ---
 ## Access
 
