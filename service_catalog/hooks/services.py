@@ -297,9 +297,9 @@ def _card_html(service: dict, lang: str = "sv") -> str:
         labels = RATING_LABELS.get(lang, RATING_LABELS["sv"])
         desc = labels.get(color, color)
         traffic_html = (
-            f'<span class="svc-traffic-badge svc-traffic-badge--{color}" '
-            f'title="{labels[\'traffic_light\']}: {desc}"></span>'
-        )
+    f'<span class="svc-traffic-badge svc-traffic-badge--{color}" '
+    f'title="{labels["traffic_light"]}: {desc}"></span>'
+)
 
     return f"""<article class="svc-card" id="svc-card-{service['id']}"
   data-id="{service['id']}"
