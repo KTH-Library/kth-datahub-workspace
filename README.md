@@ -14,8 +14,8 @@ support at KTH, built with MkDocs and deployed to GitHub Pages.
 - If you only have small text contributions (e.g., additions, corrections),
   we suggest you (in order of increasing required technical know-how):
   1. propose your changes by using the built-in editing function here on Github (described below), or
-  2. [open an issue](issues), or
-  3. [create a pull request](pull) ([how?](https://github.blog/developer-skills/github/beginners-guide-to-github-creating-a-pull-request)).
+  2. [open an issue](../../issues), or
+  3. [create a pull request](../../pulls) ([how?](https://github.blog/developer-skills/github/beginners-guide-to-github-creating-a-pull-request)).
 - If you want to preview your changes, follow the instructions in
   the [Local development section](#local-development) below.
 
@@ -148,7 +148,7 @@ uv run mkdocs build --clean --strict -v
 
 If you spot a typo, error, or want to add more information, feel free to contribute, we welcome all contributions to the KTH Data Hub Workspace.
 
-Please [open an issue](issues) or [submit a pull request](pulls).
+Please [open an issue](../../issues) or [submit a pull request](../../pulls).
 
 To submit a pull request, you always need to start by forking, but note that you
 can replace the traditional workflow of *cloning, committing, then pushing* by simply
