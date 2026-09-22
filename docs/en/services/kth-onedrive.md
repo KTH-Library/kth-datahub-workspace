@@ -11,8 +11,9 @@ access: Available to all staff and students with a KTH account.
 link: https://intra.kth.se/it/lagring
 link_requires_login: false
 rating:
-  legal: green
-  note: "Integrated service provided by central IT"
+  legal: 
+    status: green
+    note: "Integrated service provided by central IT."
   ip: green
   security: green
   cost: green
