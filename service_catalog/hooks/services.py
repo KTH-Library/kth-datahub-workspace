@@ -88,6 +88,28 @@ RATING_LABELS = {
         "traffic_light": "Overall Risk Profile",
     },
 }
+# Icons for modal collapsible sections
+SECTION_ICONS = {
+    # Svenska
+    "åtkomst": "material/key",
+    "om tjänsten": "material/book-open-page-variant",
+    "guider": "material/compass-outline",
+    "support": "material/help-circle-outline",
+    # Engelska
+    "access": "material/key",
+    "about the service": "material/book-open-page-variant",
+    "about": "material/book-open-page-variant",
+    "guides": "material/compass-outline",
+    "support": "material/help-circle-outline",
+}
+DEFAULT_SECTION_ICON = "material/text-box-outline"
+
+
+def _section_icon(title: str) -> str:
+    """Return an inlined SVG icon corresponding to the section title."""
+    clean_title = title.lower().strip()
+    icon_name = SECTION_ICONS.get(clean_title, DEFAULT_SECTION_ICON)
+    return _icon_html(icon_name)
 
 
 def normalize_ratings(raw_ratings: dict) -> dict[str, dict[str, str]]:
@@ -383,10 +405,16 @@ LABELS = {
 def _modal_html(service: dict, t: dict, lang: str = "sv") -> str:
     tags = "".join(_tag_html(x) for x in service["tags"])
     sections = "".join(
-        f'<details class="svc-section"><summary>{html.escape(s["title"])}</summary>'
-        f'<div class="svc-section__body">{s["html"]}</div></details>'
+        f'<details class="svc-section">'
+        f'<summary>'
+        f'{_section_icon(s["title"])}'
+        f'<span class="svc-section__title">{html.escape(s["title"])}</span>'
+        f'</summary>'
+        f'<div class="svc-section__body">{s["html"]}</div>'
+        f'</details>'
         for s in service["sections"]
     )
+
     link = ""
     if service["link"]:
         login = t["login"] if service["link_login"] else ""
