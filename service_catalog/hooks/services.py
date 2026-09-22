@@ -90,22 +90,40 @@ RATING_LABELS = {
 }
 
 
-def normalize_ratings(raw_ratings: dict) -> dict[str, str]:
-    """Normalize rating keys and color values to standard English tokens."""
+def normalize_ratings(raw_ratings: dict) -> dict[str, dict[str, str]]:
+    """Normalize rating keys, color values, and optional explanatory notes.
+    
+    Supports both compact format:
+        legal: green
+    and detailed format with note:
+        legal:
+          status: green
+          note: "Approved by KTH legal team."
+    """
     if not isinstance(raw_ratings, dict):
         return {}
     normalized = {}
     for key, val in raw_ratings.items():
         clean_key = RATING_KEY_ALIASES.get(str(key).lower().strip(), str(key).lower().strip())
-        clean_val = RATING_COLORS.get(str(val).lower().strip())
-        if clean_val:
-            normalized[clean_key] = clean_val
+        status_val = None
+        note_val = ""
+
+        if isinstance(val, dict):
+            raw_status = val.get("status") or val.get("color") or val.get("farg") or val.get("färg")
+            status_val = RATING_COLORS.get(str(raw_status).lower().strip()) if raw_status else None
+            raw_note = val.get("note") or val.get("kommentar") or val.get("beskrivning") or ""
+            note_val = str(raw_note).strip()
+        elif isinstance(val, str):
+            status_val = RATING_COLORS.get(val.lower().strip())
+
+        if status_val:
+            normalized[clean_key] = {"status": status_val, "note": note_val}
     return normalized
 
 
-def calculate_overall_rating(ratings: dict[str, str]) -> str | None:
+def calculate_overall_rating(ratings: dict[str, dict[str, str]]) -> str | None:
     """Calculate overall traffic light badge:
-    
+
     1. If no ratings exist at all -> return None (no badge shown)
     2. Any critical is red -> red
     3. Any critical is yellow -> yellow
@@ -115,7 +133,10 @@ def calculate_overall_rating(ratings: dict[str, str]) -> str | None:
     if not ratings:
         return None
 
-    critical_values = [ratings.get(dim) for dim in CRITICAL_RATINGS]
+    critical_values = [
+        ratings[dim]["status"] if dim in ratings else None
+        for dim in CRITICAL_RATINGS
+    ]
 
     # Red always surfaces immediately
     if "red" in critical_values:
@@ -398,12 +419,57 @@ def _modal_html(service: dict, t: dict, lang: str = "sv") -> str:
                 f'<span class="svc-modal__rating-val">{color_label}</span>'
                 f'</div>'
             )
+            # Build expandable risk profile if ratings exist
+    ratings_html = ""
+    norm_ratings = service.get("ratings", {})
+    if norm_ratings:
+        labels = RATING_LABELS.get(lang, RATING_LABELS["sv"])
+        overall_color = service.get("overall_rating") or "grey"
+        overall_desc = labels.get(overall_color, labels["missing"])
+
+        rows = []
+        all_dimensions = CRITICAL_RATINGS + NON_CRITICAL_RATINGS
+        for dim in all_dimensions:
+            dim_title = labels.get(dim, dim.capitalize())
+            dim_data = norm_ratings.get(dim)
+            if dim_data:
+                color = dim_data["status"]
+                note = dim_data.get("note", "")
+                color_label = labels.get(color, color)
+                badge_class = f"svc-traffic-badge--{color}"
+            else:
+                color_label = labels.get("missing", "Missing")
+                badge_class = "svc-traffic-badge--missing"
+                note = ""
+
+            note_html = (
+                f'<p class="svc-modal__rating-note">{html.escape(note)}</p>'
+                if note else ""
+            )
+
+            rows.append(
+                f'<div class="svc-modal__rating-item">'
+                f'<div class="svc-modal__rating-header">'
+                f'<span class="svc-traffic-badge {badge_class}"></span>'
+                f'<span class="svc-modal__rating-dim">{dim_title}</span>'
+                f'<span class="svc-modal__rating-val">{color_label}</span>'
+                f'</div>'
+                f'{note_html}'
+                f'</div>'
+            )
+
         ratings_html = (
-            f'<div class="svc-modal__ratings">'
-            f'<h4>{labels["traffic_light"]}</h4>'
+            f'<details class="svc-modal__ratings-details">'
+            f'<summary class="svc-modal__ratings-summary">'
+            f'<span class="svc-traffic-badge svc-traffic-badge--{overall_color}"></span>'
+            f'<span class="svc-modal__ratings-summary-text">'
+            f'<strong>{labels["traffic_light"]}:</strong> {overall_desc}'
+            f'</span>'
+            f'</summary>'
             f'<div class="svc-modal__rating-list">{"".join(rows)}</div>'
-            f'</div>'
+            f'</details>'
         )
+
 
     return f"""<div class="svc-modal" id="svc-modal-{service['id']}" role="dialog" aria-modal="true"
   aria-labelledby="svc-modal-title-{service['id']}" hidden>
