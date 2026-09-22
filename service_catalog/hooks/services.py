@@ -395,31 +395,7 @@ def _modal_html(service: dict, t: dict, lang: str = "sv") -> str:
             f'{t["to_service"]}{login}</a>'
         )
 
-    # Bygg bedömningstabellen om betyg finns
-    ratings_html = ""
-    norm_ratings = service.get("ratings", {})
-    if norm_ratings:
-        labels = RATING_LABELS.get(lang, RATING_LABELS["sv"])
-        rows = []
-        all_dimensions = CRITICAL_RATINGS + NON_CRITICAL_RATINGS
-        for dim in all_dimensions:
-            dim_title = labels.get(dim, dim.capitalize())
-            color = norm_ratings.get(dim)
-            if color:
-                color_label = labels.get(color, color)
-                badge_class = f"svc-traffic-badge--{color}"
-            else:
-                color_label = labels.get("missing", "Missing")
-                badge_class = "svc-traffic-badge--missing"
-
-            rows.append(
-                f'<div class="svc-modal__rating-row">'
-                f'<span class="svc-traffic-badge {badge_class}"></span>'
-                f'<span class="svc-modal__rating-dim">{dim_title}</span>'
-                f'<span class="svc-modal__rating-val">{color_label}</span>'
-                f'</div>'
-            )
-            # Build expandable risk profile if ratings exist
+    # Build expandable risk profile if ratings exist
     ratings_html = ""
     norm_ratings = service.get("ratings", {})
     if norm_ratings:
@@ -431,16 +407,24 @@ def _modal_html(service: dict, t: dict, lang: str = "sv") -> str:
         all_dimensions = CRITICAL_RATINGS + NON_CRITICAL_RATINGS
         for dim in all_dimensions:
             dim_title = labels.get(dim, dim.capitalize())
-            dim_data = norm_ratings.get(dim)
-            if dim_data:
-                color = dim_data["status"]
-                note = dim_data.get("note", "")
+            dim_val = norm_ratings.get(dim)
+
+            if isinstance(dim_val, dict):
+                color = dim_val.get("status")
+                note = dim_val.get("note", "")
+            elif isinstance(dim_val, str):
+                color = dim_val
+                note = ""
+            else:
+                color = None
+                note = ""
+
+            if color:
                 color_label = labels.get(color, color)
                 badge_class = f"svc-traffic-badge--{color}"
             else:
                 color_label = labels.get("missing", "Missing")
                 badge_class = "svc-traffic-badge--missing"
-                note = ""
 
             note_html = (
                 f'<p class="svc-modal__rating-note">{html.escape(note)}</p>'
@@ -469,6 +453,7 @@ def _modal_html(service: dict, t: dict, lang: str = "sv") -> str:
             f'<div class="svc-modal__rating-list">{"".join(rows)}</div>'
             f'</details>'
         )
+
 
 
     return f"""<div class="svc-modal" id="svc-modal-{service['id']}" role="dialog" aria-modal="true"
