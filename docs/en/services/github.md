@@ -1,47 +1,51 @@
 ---
-name: GitHub
-icon: material/github
-provider: Microsoft
-group: Datahantering
-type: Versionshantering
-data: Kod
-location: Globalt
-summary: Version control and collaboration for code, analysis scripts and documentation, with a KTH organisation available.
-access: Free accounts for anyone; KTH-Library and other KTH organisations host institutional repositories.
-link: https://github.com/KTH-Library
+name: Version Control Platform Gamma
+icon: material/source-branch
+provider: Provider C
+group: Data Management
+type: Version Control
+data: Source Code
+location: Global
+summary: Platform for version control and collaboration on software, analysis scripts, and documentation.
+access: Individual accounts available; institutional organisations can host shared repositories.
+link: https://example.com
 link_requires_login: false
 
 rating:
   legal:
     status: yellow
-    note: "Suitable for open-source code and collaboration. Should not be used for classified information or sensitive personal data."
+    note: "Suitable for source code and collaborative development. Sensitive personal information and regulated data require separate assessment."
 
   ip:
     status: yellow
-    note: "Requires awareness of the selected licence and the rights of external contributors."
+    note: "Users should understand licence terms, ownership arrangements, and the rights associated with external contributions."
 
   security:
     status: green
-    note: "Supports two-factor authentication (2FA) and KTH SSO through GitHub Enterprise."
+    note: "Supports multi-factor authentication and institutional identity integration."
 
   cost: green
   support: yellow
 
 ---
+
 ## Access
 
-Create a personal account and ask the relevant KTH organisation owner to add
-you. Private repositories are included at no cost for academic use.
+Create an individual account and request access to the relevant institutional
+organisation or project workspace. Standard repository functionality is
+available without additional cost.
 
 ## Guides
 
-1. Create a repository and add a `README.md` and a licence file.
-2. Clone it locally with `git clone` and commit your work regularly.
-3. Use branches and pull requests when several people work in parallel.
-4. Connect the repository to Zenodo to get a DOI for each release.
+1. Create a repository and add a README and licence file.
+2. Clone the repository locally and commit changes regularly.
+3. Use branches and merge requests when several people work in parallel.
+4. Create releases to preserve important project milestones.
 
-## About the service
+## About the Service
 
-GitHub is well suited for code and text-based material. It should not be used
-for personal data or large binary datasets. Data stored on GitHub is hosted
-globally, which must be considered when the project has location requirements.
+The platform is designed for source code, documentation, and other text-based
+project material. It is not intended for sensitive personal data or large
+binary datasets without additional controls. As data may be hosted across
+multiple geographic regions, location and compliance requirements should be
+reviewed before use.
