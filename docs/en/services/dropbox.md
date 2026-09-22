@@ -1,14 +1,14 @@
 ---
-name: Dropbox
-icon: material/dropbox
-provider: Dropbox Inc.
-group: Datahantering
-type: Lagring
-data: Arbetsmaterial
-location: Globalt
-summary: Commercial file sync and sharing, common in external collaborations but not covered by a central KTH agreement.
-access: Personal or project-funded subscription; no KTH-wide agreement.
-link: https://www.dropbox.com
+name: Storage Service Alpha
+icon: material/folder
+provider: Provider A
+group: Data Management
+type: Storage
+data: Working Material
+location: Global
+summary: Commercial file storage and sharing service commonly used in external collaborations, but not covered by a central institutional agreement.
+access: Personal or project-funded subscription; no institution-wide agreement.
+link: https://example.com
 link_requires_login: false
 
 rating:
@@ -21,18 +21,20 @@ rating:
 
 ## Access
 
-There is no central KTH agreement, so cost is carried by the project or the
-individual. Compared with KTH OneDrive, which is already paid for centrally,
-Dropbox adds a direct cost.
+There is no central institutional agreement, so costs are carried by the
+project or the individual user. Compared with centrally provided storage
+services, this solution may introduce additional direct costs.
 
 ## Guides
 
-1. Create or join a Dropbox team owned by the project.
-2. Set up a shared project folder with named members rather than public links.
-3. Review sharing settings regularly and remove members when they leave.
+1. Create or join a workspace owned by the project.
+2. Set up shared folders with named members rather than public links.
+3. Review sharing permissions regularly and remove users who no longer require access.
 
-## About the service
+## About the Service
 
-Dropbox is widely used by external partners, which can make it practical in
-collaborations. Storage location is global and no KTH data processing agreement
-is in place, so it should not be used for personal or confidential data.
+This type of service is commonly used by external organisations, which may make
+it practical for collaborations. Data may be stored in multiple geographic
+regions, and no institution-specific data processing agreement is assumed to be
+in place. Personal data, confidential information, and other sensitive material
+therefore require careful assessment before use.
