@@ -11,6 +11,10 @@ access: Log in with your KTH account through the EOSC EU Node; a free allocation
 link: https://open-science-cloud.ec.europa.eu
 link_requires_login: true
 ---
+rating:
+  legal: green
+  cost: green
+  support: yellow
 
 ## Access
 
