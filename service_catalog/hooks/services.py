@@ -465,8 +465,8 @@ def _modal_html(service: dict, t: dict, lang: str = "sv") -> str:
     <h2 class="svc-modal__title" id="svc-modal-title-{service['id']}">{html.escape(service['name'])}</h2>
     <p class="svc-modal__provider">{_value_html(service['provider'])}</p>
     <p class="svc-modal__summary">{_value_html(service['summary'])}</p>
-    {ratings_html}
     <div class="svc-modal__tags">{tags}</div>
+    {ratings_html}
     <div class="svc-modal__sections">{sections}</div>
     <div class="svc-modal__actions">
       <a class="svc-btn" href="{service['page']}">{t['about']}</a>
