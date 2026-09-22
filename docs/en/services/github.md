@@ -11,6 +11,12 @@ access: Free accounts for anyone; KTH-Library and other KTH organisations host i
 link: https://github.com/KTH-Library
 link_requires_login: false
 ---
+rating:
+  legal: yellow
+  ip: yellow
+  security: green
+  cost: green
+  support: yellow
 
 ## Access
 
