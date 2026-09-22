@@ -76,7 +76,7 @@ extra:
   generator: false
   social:
     - icon: simple/github
-      link: https://github.com/KTH-Library/kth-digital-research-handbook
+      link: https://github.com/KTH-Library/kth-datahub-workspace
 validation:
 # https://www.mkdocs.org/user-guide/configuration/#validation
   omitted_files: warn
