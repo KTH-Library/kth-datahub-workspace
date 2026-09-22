@@ -44,6 +44,10 @@
   gap: 1rem;
 }
 
+.svc-card[hidden] {
+  display: none !important;
+}
+
 .svc-card {
   display: flex;
   flex-direction: column;
