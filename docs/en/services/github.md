@@ -10,14 +10,14 @@ summary: Version control and collaboration for code, analysis scripts and docume
 access: Free accounts for anyone; KTH-Library and other KTH organisations host institutional repositories.
 link: https://github.com/KTH-Library
 link_requires_login: false
----
+
 rating:
   legal: yellow
   ip: yellow
   security: green
   cost: green
   support: yellow
-
+---
 ## Access
 
 Create a personal account and ask the relevant KTH organisation owner to add
