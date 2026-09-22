@@ -21,9 +21,14 @@
     var noresults = archive.querySelector(".svc-noresults");
     var lastFocus = null;
 
-    function matches(card) {
+   function matches(card) {
       var q = search.value.trim().toLowerCase();
-      if (q && card.dataset.search.indexOf(q) === -1) return false;
+      if (q) {
+        var terms = q.split(/\s+/);
+        for (var i = 0; i < terms.length; i++) {
+          if (card.dataset.search.indexOf(terms[i]) === -1) return false;
+        }
+      }
       for (var key in selects) {
         var value = selects[key].value;
         if (value && card.dataset[key] !== value) return false;
