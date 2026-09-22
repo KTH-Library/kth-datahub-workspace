@@ -365,17 +365,47 @@
 
 .svc-modal__summary { margin: .6rem 0 .4rem; }
 
+/* -------------------------------------------------------------------------
+ * Modal Collapsible Sections (<details>)
+ * ------------------------------------------------------------------------- */
+
 .svc-section {
   border-top: 1px solid var(--md-default-fg-color--lightest);
 }
 
+/* Ta bort Material-temats standardikon (den blå pennan) */
+.svc-section > summary::before {
+  display: none !important;
+  content: none !important;
+}
+
 .svc-section > summary {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
   cursor: pointer;
-  padding: .6rem 0;
+  padding: 0.6rem 0;
   font-weight: 700;
 }
 
-.svc-section__body { padding-bottom: .6rem; font-size: .8rem; }
+/* Den nya sektionsikonen */
+.svc-section > summary .svc-icon {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.svc-section > summary .svc-icon svg {
+  width: 1.15rem;
+  height: 1.15rem;
+  fill: var(--md-primary-fg-color);
+}
+
+.svc-section__body {
+  padding-bottom: 0.6rem;
+  font-size: 0.8rem;
+}
+
 
 .svc-modal__actions {
   display: flex;
