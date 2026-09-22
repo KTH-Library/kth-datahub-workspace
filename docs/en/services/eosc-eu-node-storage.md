@@ -10,12 +10,12 @@ summary: European Open Science Cloud storage and compute for project data, inclu
 access: Log in with your KTH account through the EOSC EU Node; a free allocation is included.
 link: https://open-science-cloud.ec.europa.eu
 link_requires_login: true
----
+
 rating:
   legal: green
   cost: green
   support: yellow
-
+---
 ## Access
 
 Sign in with your institutional identity (KTH) via the EOSC EU Node portal. A
