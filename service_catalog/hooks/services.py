@@ -23,7 +23,7 @@ log = logging.getLogger("mkdocs.hooks.services")
 
 MARKER = "<!-- SERVICES_ARCHIVE -->"
 SERVICES_DIRNAME = ""
-MISSING = "uppgift saknas"
+MISSING = "Missing data"
 
 # Which front matter keys become tags, and the colour class they get.
 TAG_GROUPS = (
@@ -35,6 +35,104 @@ TAG_GROUPS = (
 )
 
 REQUIRED = ("name", "provider", "group", "summary")
+
+# ---------------------------------------------------------------------------
+# Traffic light ratings
+# ---------------------------------------------------------------------------
+
+# Critical dimensions determine the overall traffic light
+CRITICAL_RATINGS = ("legal", "ip", "security")
+NON_CRITICAL_RATINGS = ("cost", "support")
+
+# Normalize color variants (both Swedish and English) to standard tokens
+RATING_COLORS = {
+    "green": "green", "gron": "green", "grön": "green",
+    "yellow": "yellow", "gul": "yellow",
+    "red": "red", "rod": "red", "röd": "red",
+    "grey": "grey", "gray": "grey", "gra": "grey", "grå": "grey",
+}
+
+# Aliases to allow Swedish keys in markdown front matter
+RATING_KEY_ALIASES = {
+    "juridik": "legal",
+    "kostnad": "cost",
+    "sakerhet": "security",
+    "säkerhet": "security",
+}
+
+RATING_LABELS = {
+    "sv": {
+        "legal": "Juridik & GDPR",
+        "ip": "Immateriella rättigheter (IP)",
+        "cost": "Kostnadsmodell",
+        "security": "Informationssäkerhet",
+        "support": "Support & Tillgänglighet",
+        "green": "Inga kända väsentliga risker",
+        "yellow": "Risker eller villkor identifierade",
+        "red": "Betydande risker identifierade",
+        "grey": "Under utredning / partiell bedömning",
+        "missing": "Bedömning saknas",
+        "traffic_light": "Övergripande riskbild",
+    },
+    "en": {
+        "legal": "Legal & GDPR",
+        "ip": "Intellectual Property (IP)",
+        "cost": "Cost Model",
+        "security": "Information Security",
+        "support": "Support & Availability",
+        "green": "No significant known risks",
+        "yellow": "Risks or conditions identified",
+        "red": "Significant risks identified",
+        "grey": "Under review / partial assessment",
+        "missing": "Assessment unavailable",
+        "traffic_light": "Overall Risk Profile",
+    },
+}
+
+
+def normalize_ratings(raw_ratings: dict) -> dict[str, str]:
+    """Normalize rating keys and color values to standard English tokens."""
+    if not isinstance(raw_ratings, dict):
+        return {}
+    normalized = {}
+    for key, val in raw_ratings.items():
+        clean_key = RATING_KEY_ALIASES.get(str(key).lower().strip(), str(key).lower().strip())
+        clean_val = RATING_COLORS.get(str(val).lower().strip())
+        if clean_val:
+            normalized[clean_key] = clean_val
+    return normalized
+
+
+def calculate_overall_rating(ratings: dict[str, str]) -> str | None:
+    """Calculate overall traffic light badge:
+    
+    1. If no ratings exist at all -> return None (no badge shown)
+    2. Any critical is red -> red
+    3. Any critical is yellow -> yellow
+    4. Any critical is grey or missing -> grey (partial assessment)
+    5. All critical are green -> green
+    """
+    if not ratings:
+        return None
+
+    critical_values = [ratings.get(dim) for dim in CRITICAL_RATINGS]
+
+    # Red always surfaces immediately
+    if "red" in critical_values:
+        return "red"
+    # Yellow surfaces if no red
+    if "yellow" in critical_values:
+        return "yellow"
+    # If any critical dimension is missing or explicitly grey -> grey
+    if any(val is None or val == "grey" for val in critical_values):
+        return "grey"
+    # Only if all critical dimensions are green
+    if all(val == "green" for val in critical_values):
+        return "green"
+
+    return "grey"
+
+
 
 _FRONT_MATTER = re.compile(r"^---\s*\n(.*?)\n---\s*\n?", re.DOTALL)
 
@@ -110,7 +208,10 @@ def _parse_service(path: str, docs_dir: str) -> dict | None:
     sections = []
     for title, section_md in _split_sections(body):
         sections.append({"title": title, "html": _md().convert(section_md)})
-
+    raw_ratings = meta.get("rating") or meta.get("ratings") or {}
+    norm_ratings = normalize_ratings(raw_ratings)
+    overall_rating = calculate_overall_rating(norm_ratings)
+    
     service = {
         "id": _slug(os.path.splitext(os.path.basename(path))[0]),
         "name": meta.get("name") or MISSING,
@@ -122,11 +223,14 @@ def _parse_service(path: str, docs_dir: str) -> dict | None:
         "access": meta.get("access") or MISSING,
         "link": meta.get("link") or "",
         "link_login": bool(meta.get("link_requires_login")),
+        "ratings": norm_ratings,           # <-- LÄGG TILL DETTA
+        "overall_rating": overall_rating,   # <-- LÄGG TILL DETTA
         "page": url,
         "tags": tags,
         "sections": sections,
         "source": rel,
     }
+
     service["search"] = " ".join(
         [service["name"], service["provider"], service["group"], service["type"],
          service["summary"], service["access"]]
@@ -184,16 +288,29 @@ def _value_html(value: str) -> str:
     return html.escape(value)
 
 
-def _card_html(service: dict) -> str:
+def _card_html(service: dict, lang: str = "sv") -> str:
     tags = "".join(_tag_html(t) for t in service["tags"])
+    
+    traffic_html = ""
+    color = service.get("overall_rating")
+    if color:
+        labels = RATING_LABELS.get(lang, RATING_LABELS["sv"])
+        desc = labels.get(color, color)
+        traffic_html = (
+            f'<span class="svc-traffic-badge svc-traffic-badge--{color}" '
+            f'title="{labels[\'traffic_light\']}: {desc}"></span>'
+        )
+
     return f"""<article class="svc-card" id="svc-card-{service['id']}"
   data-id="{service['id']}"
   data-provider="{html.escape(_slug(service['provider']), quote=True)}"
   data-group="{html.escape(_slug(service['group']), quote=True)}"
   data-type="{html.escape(_slug(service['type']), quote=True)}"
+  data-rating="{color or ''}"
   data-tags="{html.escape(' '.join(t['value'] for t in service['tags']), quote=True)}"
   data-search="{html.escape(service['search'], quote=True)}">
   <button type="button" class="svc-card__open" data-open="{service['id']}">
+    {traffic_html}
     <span class="svc-card__icon">{_icon_html(service['icon'])}</span>
     <span class="svc-card__title">{html.escape(service['name'])}</span>
     <span class="svc-card__provider">{_value_html(service['provider'])}</span>
@@ -201,6 +318,7 @@ def _card_html(service: dict) -> str:
   </button>
   <div class="svc-card__tags">{tags}</div>
 </article>"""
+
 
 
 LABELS = {
@@ -241,7 +359,7 @@ LABELS = {
 }
 
 
-def _modal_html(service: dict, t: dict) -> str:
+def _modal_html(service: dict, t: dict, lang: str = "sv") -> str:
     tags = "".join(_tag_html(x) for x in service["tags"])
     sections = "".join(
         f'<details class="svc-section"><summary>{html.escape(s["title"])}</summary>'
@@ -255,6 +373,38 @@ def _modal_html(service: dict, t: dict) -> str:
             f'<a class="svc-btn svc-btn--primary" href="{html.escape(service["link"], quote=True)}">'
             f'{t["to_service"]}{login}</a>'
         )
+
+    # Bygg bedömningstabellen om betyg finns
+    ratings_html = ""
+    norm_ratings = service.get("ratings", {})
+    if norm_ratings:
+        labels = RATING_LABELS.get(lang, RATING_LABELS["sv"])
+        rows = []
+        all_dimensions = CRITICAL_RATINGS + NON_CRITICAL_RATINGS
+        for dim in all_dimensions:
+            dim_title = labels.get(dim, dim.capitalize())
+            color = norm_ratings.get(dim)
+            if color:
+                color_label = labels.get(color, color)
+                badge_class = f"svc-traffic-badge--{color}"
+            else:
+                color_label = labels.get("missing", "Missing")
+                badge_class = "svc-traffic-badge--missing"
+
+            rows.append(
+                f'<div class="svc-modal__rating-row">'
+                f'<span class="svc-traffic-badge {badge_class}"></span>'
+                f'<span class="svc-modal__rating-dim">{dim_title}</span>'
+                f'<span class="svc-modal__rating-val">{color_label}</span>'
+                f'</div>'
+            )
+        ratings_html = (
+            f'<div class="svc-modal__ratings">'
+            f'<h4>{labels["traffic_light"]}</h4>'
+            f'<div class="svc-modal__rating-list">{"".join(rows)}</div>'
+            f'</div>'
+        )
+
     return f"""<div class="svc-modal" id="svc-modal-{service['id']}" role="dialog" aria-modal="true"
   aria-labelledby="svc-modal-title-{service['id']}" hidden>
   <div class="svc-modal__backdrop" data-close="{service['id']}"></div>
@@ -264,6 +414,7 @@ def _modal_html(service: dict, t: dict) -> str:
     <h2 class="svc-modal__title" id="svc-modal-title-{service['id']}">{html.escape(service['name'])}</h2>
     <p class="svc-modal__provider">{_value_html(service['provider'])}</p>
     <p class="svc-modal__summary">{_value_html(service['summary'])}</p>
+    {ratings_html}
     <div class="svc-modal__tags">{tags}</div>
     <div class="svc-modal__sections">{sections}</div>
     <div class="svc-modal__actions">
@@ -285,16 +436,14 @@ def _options(values) -> str:
     )
 
 
-def _archive_html(services: list[dict], t: dict) -> str:
+def _archive_html(services: list[dict], t: dict, lang: str = "sv") -> str:
     if not services:
         return f'<p class="svc-empty">{t["empty"]}</p>'
-
     providers = _options(s["provider"] for s in services)
     groups = _options(s["group"] for s in services)
     types = _options(s["type"] for s in services)
-
-    cards = "".join(_card_html(s) for s in services)
-    modals = "".join(_modal_html(s, t) for s in services)
+    cards = "".join(_card_html(s, lang) for s in services)
+    modals = "".join(_modal_html(s, t, lang) for s in services)
 
     return f"""<div class="svc-archive" data-count="{len(services)}"
   data-label-of="{t['of']}" data-label-items="{t['items']}">
@@ -318,5 +467,7 @@ def on_page_markdown(markdown, page, config, files, **kwargs):
     src = page.file.src_path.replace(os.sep, "/")
     lang = "sv" if src.startswith("sv/") else "en"
     services = _collect(page, config)
-    return markdown.replace(MARKER, _archive_html(services, LABELS[lang]))
+    return markdown.replace(MARKER, _archive_html(services, LABELS[lang], lang))
+
+
 
