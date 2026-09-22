@@ -11,6 +11,13 @@ access: Personal or project-funded subscription; no KTH-wide agreement.
 link: https://www.dropbox.com
 link_requires_login: false
 ---
+rating:
+  legal: red
+  ip: yellow
+  security: red
+  cost: yellow
+  support: yellow
+
 
 ## Access
 
