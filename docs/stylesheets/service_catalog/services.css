@@ -223,6 +223,17 @@
   color: var(--md-default-fg-color);
   list-style: none; /* Hide default browser arrow */
 }
+/* Ta bort MkDocs Materials inbyggda blå ikon från vår summary */
+.svc-modal__ratings-summary::before {
+  display: none !important;
+  content: none !important;
+}
+
+/* Tvinga luft och avstånd mellan trafikljuspricken och texten */
+.svc-modal__ratings-summary .svc-traffic-badge {
+  margin-right: 0.65rem;
+  flex-shrink: 0;
+}
 
 .svc-modal__ratings-summary::-webkit-details-marker {
   display: none; /* Hide Chrome/Safari arrow */
