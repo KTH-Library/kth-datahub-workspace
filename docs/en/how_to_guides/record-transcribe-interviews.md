@@ -6,6 +6,7 @@ This guide is a complement to the [Interview studies: good research data managem
 article, which you might want to read first.
 
 On this page you can find practical guides for recording and transcribing using
+[//]: # (perhaps we should link to the Digital Services page?)
 digital tools and services via KTH IT-provided platforms such as Zoom, Play, MS365/Copilot,
 national research infrastructure or locally installed software on your own device.
 Notes are provided for information that is relevant for assessing the risks related

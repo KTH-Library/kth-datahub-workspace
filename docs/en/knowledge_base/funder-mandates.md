@@ -1,10 +1,10 @@
 # Funders' mandates or guidelines
 
 The aim with this page is to help you check for compliance with funder mandates
-and guidelines when you are planning your research.
+or guidelines for open access to research results when you are planning your research.
 
-The table below summarizes the open science mandates for the largest Swedish funders of research at KTH, sorted in decreasing
-order of funding:
+The table below summarizes the open science mandates for the largest Swedish funders
+of research at KTH, sorted in decreasing order of funding:
 
 | Funder |  Open access to publications? | Open access to research data? | Data management plan needed? | IP rights |
 | ---    | ---                          | ---                          | ---                          | ---       |
