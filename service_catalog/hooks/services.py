@@ -405,19 +405,7 @@ def _parse_service(path: str, docs_dir: str) -> dict[str, Any] | None:
          service["summary"], service["access"]]
         + [t["label"] for t in tags]
     ).lower()
-        # Service pages sit next to the overview page, so a relative
-        # "<name>/" link works in both languages and under a sub-path deploy.
-        "page": re.sub(r"\.md$", "/", filename),
-        "tags": _build_tags(meta),
-        "sections": [
-            {"title": title, "html": _markdown_renderer().convert(section_md)}
-            for title, section_md in _split_sections(body)
-        ],
-        "source": os.path.relpath(path, docs_dir).replace(os.sep, "/"),
-    }
-    service["search"] = _search_blob(service, service["tags"])
-    return service
-
+       
 
 def _collect(page: Any, config: Any) -> list[dict[str, Any]]:
     """Collect every service defined next to the overview page.
