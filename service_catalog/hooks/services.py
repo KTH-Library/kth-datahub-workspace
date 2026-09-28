@@ -381,8 +381,6 @@ def _parse_service(path: str, docs_dir: str) -> dict[str, Any] | None:
     norm_ratings = normalize_ratings(raw_ratings)
     overall_rating = calculate_overall_rating(norm_ratings)
     
-    service = {
-        "id": _slug(os.path.splitext(os.path.basename(path))[0]),
     service: dict[str, Any] = {
         "id": _slug(os.path.splitext(filename)[0]),
         "name": meta.get("name") or MISSING,
