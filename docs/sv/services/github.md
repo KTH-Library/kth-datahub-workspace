@@ -2,35 +2,35 @@
 name: GitHub
 icon: material/github
 provider: Microsoft
-group: Datahantering
-type: Versionshantering
-data: Kod
-location: Globalt
+group: RDM
+type: Versioning
+data: Code
+location: Global
 summary: >
-  Versionshantering och samarbete kring kod,
-  analysskript och dokumentation, med
-  KTH-organisationer tillgängliga.
+  Proprietär plattform för delning, lagring och hantering av kod,
+  med tillhörande funktioner för samarbeten kring projekt.
 access: >
-  Kostnadsfria konton för alla; KTH-Library och
-  andra KTH-organisationer rymmer institutionella
-  repositorier.
+  Många funktioner kräver ett konto, men att skapa ett konto är kostnadsfritt.
+  KTH Biblioteket och andra KTH-enheter har institutionella förråd.
 link: https://github.com/KTH-Library
 link_requires_login: false
 rating:
   legal:
     status: yellow
     note: >
-      Suitable for source code and collaborative development.
-      Sensitive personal information and regulated data require separate assessment.
+      Lämplig för källkod och utveckling i samarbete med andra.
+      Delning av personuppgifter eller andra känsliga uppgifter kräver
+      bedömning i varje enskilt fall.
   ip:
     status: yellow
     note: >
-      Users should understand licence terms, ownership arrangements, and
-      the rights associated with external contributions.
+      Använd inte utan att förstå licensvillkor, vem som äger kod, och
+      hur kod från externa parter är licensierad.
   security:
     status: green
     note: >
-      Supports multi-factor authentication and institutional identity integration.
+      Stödjer multifaktor-autentisering och integration med institutionell
+      "identity management".
   cost: green
   support: yellow
 ---

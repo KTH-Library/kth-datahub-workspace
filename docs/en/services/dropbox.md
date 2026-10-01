@@ -2,10 +2,10 @@
 name: Dropbox
 icon: material/dropbox
 provider: Dropbox Inc.
-group: Datahantering
-type: Lagring
-data: Arbetsmaterial
-location: Globalt
+group: RDM
+type: Storage
+data: Work material
+location: Global
 summary: >
    Commercial file sync and sharing, common in external collaborations but
    not covered by a central KTH agreement.

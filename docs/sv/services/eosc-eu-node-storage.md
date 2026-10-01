@@ -2,16 +2,15 @@
 name: EOSC EU Node lagring
 icon: material/cloud-lock
 provider: EOSC
-group: Molntjänster och beräkning
-type: Lagring
-data: Forskningsdata
+group: Cloud services and compute
+type: Storage
+data: Research data
 location: EU
 summary: >
-   Lagring och beräkning i European Open Science Cloud,
-   inklusive Jupyter notebooks nära data.
+   Lagring och beräkning i European Open Science Cloud, inklusive
+   Jupyter notebooks i anslutning till data.
 access: >
-   Logga in med KTH-konto via EOSC EU Node;
-   en kostnadsfri tilldelning ingår.
+   Logga in med KTH-konto via EOSC EU Node; en kostnadsfri tilldelning ingår.
 link: https://open-science-cloud.ec.europa.eu
 link_requires_login: true
 rating:

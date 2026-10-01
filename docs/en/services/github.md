@@ -2,12 +2,16 @@
 name: GitHub
 icon: material/github
 provider: Microsoft
-group: Datahantering
-type: Versionshantering
-data: Kod
-location: Globalt
-summary: Version control and collaboration for code, analysis scripts and documentation, with a KTH organisation available.
-access: Free accounts for anyone; KTH Library and other KTH organisations host institutional repositories.
+group: RDM
+type: Versioning
+data: Code
+location: Global
+summary: >
+  Proprietary code forge and developer platform that allows anyone to
+  create an account and store, manage, and share their code.
+access: >
+  Many functions require an account, but creating an account is free of cost.
+  KTH Library and other KTH organisations maintain institutional repositories.
 link: https://github.com/KTH-Library
 link_requires_login: false
 rating:

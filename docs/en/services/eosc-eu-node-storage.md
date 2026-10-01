@@ -2,9 +2,9 @@
 name: EOSC EU Node storage
 icon: material/cloud-lock
 provider: EOSC
-group: Molntjänster och beräkning
-type: Lagring
-data: Forskningsdata
+group: Cloud services and compute
+type: Storage
+data: Research data
 location: EU
 summary: >
    European Open Science Cloud storage and compute for project data, including

@@ -2,16 +2,15 @@
 name: Dropbox
 icon: material/dropbox
 provider: Dropbox Inc.
-group: Datahantering
-type: Lagring
-data: Arbetsmaterial
-location: Globalt
+group: RDM
+type: Storage
+data: Work material
+location: Global
 summary: >
-   Kommersiell fildelning som är vanlig i externa
-   samarbeten men saknar centralt KTH-avtal.
+   Kommersiell fildelning som är vanlig i externa samarbeten men saknar centralt
+   KTH-avtal.
 access: >
-   Personligt eller projektfinansierat abonnemang;
-   inget KTH-övergripande avtal.
+   Personligt eller projektfinansierat abonnemang; inget KTH-övergripande avtal.
 link: https://www.dropbox.com
 link_requires_login: false
 rating:

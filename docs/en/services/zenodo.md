@@ -2,16 +2,15 @@
 name: Zenodo
 icon: material/database-arrow-up
 provider: CERN / EU
-group: FAIR-resurser
-type: Publicering
-data: Öppna data
+group: FAIR
+type: Publication
+data: Open data
 location: EU
 summary: >
    General-purpose repository for publishing datasets, software and other
    research output with a DOI.
 access: >
-  Open to anyone; log in with ORCID, GitHub or
-  a Zenodo account.
+  Open to anyone; log in with ORCID, GitHub or a Zenodo account.
 link: https://zenodo.org
 link_requires_login: false
 rating:

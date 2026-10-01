@@ -1,35 +1,34 @@
 ---
 name: KTH OneDrive
 icon: material/microsoft-onedrive
-provider: KTH
-group: Datahantering
-type: Lagring
-data: Arbetsmaterial
+provider: KTH IT
+group: RDM
+type: Storage
+data: Work material
 location: EU
 summary: >
-  Personlig och delad molnlagring som ingår i KTH:s
-  Microsoft 365-avtal, lämplig för löpande arbetsmaterial.
+  Personlig och delad molnlagring som ingår i KTH:s Microsoft 365-avtal,
+  lämplig för löpande arbetsmaterial.
 access: >
-  Tillgänglig för alla anställda och studenter med
-  KTH-konto.
+  Tillgänglig för alla anställda och studenter med KTH-konto.
 link: https://intra.kth.se/it/lagring
 link_requires_login: false
 rating:
   legal:
     status: green
     note: >
-      Provided through a centrally managed institutional service.
+      Tillhandahålls genom en centralt förvaltad KTH-IT tjänst.
   ip: green
   security:
     status: green
     note: >
-      Integrated with institutional identity management and security controls.
+      Integrerad med KTH IT identitetshantering och säkerhetskontroller.
   cost:
     status: green
-    note: Included as part of centrally funded services.
+    note: Ingår i KTH IT:s centralt finansierade tjänster.
   support:
     status: green
-    note: Supported by the central IT organisation.
+    note: Med stöd av den centrala IT-organisationen.
 ---
 
 ## Åtkomst
