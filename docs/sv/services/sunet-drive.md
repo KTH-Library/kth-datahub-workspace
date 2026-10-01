@@ -2,6 +2,7 @@
 name: SUNET Drive
 icon: material/cloud-lock
 provider: SUNET
+group: Groupware
 type: Storage
 data: Work material
 location: National
