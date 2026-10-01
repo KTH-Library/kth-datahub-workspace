@@ -1,77 +1,32 @@
-"""MkDocs hook that renders the digital service catalogue.
+"""MkDocs hook: builds the digital services archive.
 
-WHY THIS EXISTS
----------------
-Editors of this site are librarians and research-support staff, not developers.
-The catalogue must therefore be maintainable by dropping a single markdown file
-into a folder — no central registry, no JSON index, no build step to remember.
-This hook is what makes that possible: it turns the markdown files next to the
-overview page into cards, filter dropdowns, clickable tags and modal windows.
+Every service is a single markdown file in <lang>/knowledge_base/services/.
+Dropping a new file in that folder is enough: it shows up as a card on the
+services overview page, becomes searchable and filterable, gets colour-coded
+clickable tags, and is published as its own "About the service" page.
 
-HOW IT PLUGS IN
----------------
-`mkdocs.yml` registers this file under `hooks:`. MkDocs then calls
-:func:`on_page_markdown` for every page. Only pages containing the marker
-``<!-- SERVICES_ARCHIVE -->`` are touched; the marker is replaced by the
-generated HTML block. Everything else passes through unchanged.
-
-INPUTS
-    * `docs/<lang>/services/index.md` — the overview page carrying the marker.
-    * `docs/<lang>/services/<service>.md` — one file per service, YAML frontmatter
-      plus `##` sections (Access / Guides / About the service).
-
-OUTPUT
-    A single raw-HTML block injected into the overview page: filter form,
-    card grid, one modal per service.
-
-SIDE EFFECTS
-    Reads files from disk and writes warnings to the MkDocs log. It never
-    writes files; strict builds turn these warnings into build failures only
-    for MkDocs' own warnings, not for ours.
-
-ASSUMPTIONS
-    * Service pages live in the SAME directory as the overview page.
-    * Language is derived from the source path prefix (`sv/` → Swedish).
-    * The generated markup is raw HTML, so styling and behaviour come from
-      `docs/stylesheets/service_catalog/services.css` and
-      `docs/javascripts/service_catalog/services.js`. The class names below are
-      a contract with those two files — renaming one means renaming all three.
-
-DEPENDENCIES
-    markdown, PyYAML and mkdocs-material (for the inline icon SVGs).
+The overview page opts in by containing the marker <!-- SERVICES_ARCHIVE -->.
 """
 
 from __future__ import annotations
 
 import html
+import json
 import logging
 import os
 import re
-from typing import Any, Iterable
 
 import markdown as md_lib
 import yaml
 
 log = logging.getLogger("mkdocs.hooks.services")
 
-# --------------------------------------------------------------------------- #
-# Constants — no magic values further down.
-# --------------------------------------------------------------------------- #
-
-#: Placeholder in the overview page that gets replaced by the generated HTML.
 MARKER = "<!-- SERVICES_ARCHIVE -->"
+SERVICES_DIRNAME = ""
+MISSING = "Missing data"
 
-#: Rendered wherever an editor left a required field empty. The specification
-#: requires missing information to be *visible* rather than silently omitted.
-MISSING = "uppgift saknas"
-
-#: Markdown extensions used when rendering the body sections of a service file.
-MD_EXTENSIONS = ["admonition", "attr_list", "md_in_html", "tables", "pymdownx.details"]
-
-#: Front matter keys that become tags, mapped to the CSS colour modifier used
-#: for them (`.svc-tag--provider`, `.svc-tag--group`, ...). Only the first three
-#: have a matching dropdown; `data` and `location` are display/search only.
-TAG_GROUPS: tuple[tuple[str, str], ...] = (
+# Which front matter keys become tags, and the colour class they get.
+TAG_GROUPS = (
     ("provider", "provider"),
     ("group", "group"),
     ("type", "type"),
@@ -79,132 +34,191 @@ TAG_GROUPS: tuple[tuple[str, str], ...] = (
     ("location", "location"),
 )
 
-#: Front matter keys a service file must define; a missing one is logged and
-#: rendered as MISSING instead of breaking the build.
-REQUIRED_FIELDS = ("name", "provider", "group", "summary")
+REQUIRED = ("name", "provider", "group", "summary")
 
-#: Files in the services folder that are never treated as a service.
-SKIPPED_FILENAMES = ("index.md",)
-SKIPPED_PREFIX = "_"
+# ---------------------------------------------------------------------------
+# Traffic light ratings
+# ---------------------------------------------------------------------------
 
-#: Icon used when a service file does not name one.
-DEFAULT_ICON = "material/apps"
+# Critical dimensions determine the overall traffic light
+CRITICAL_RATINGS = ("legal", "ip", "security")
+NON_CRITICAL_RATINGS = ("cost", "support")
 
-#: Heading level that separates the expandable sections inside a service file.
-SECTION_PREFIX = "## "
+# Normalize color variants (both Swedish and English) to standard tokens
+RATING_COLORS = {
+    "green": "green", "gron": "green", "grön": "green",
+    "yellow": "yellow", "gul": "yellow",
+    "red": "red", "rod": "red", "röd": "red",
+    "grey": "grey", "gray": "grey", "gra": "grey", "grå": "grey",
+}
+
+# Aliases to allow Swedish keys in markdown front matter
+RATING_KEY_ALIASES = {
+    "juridik": "legal",
+    "kostnad": "cost",
+    "sakerhet": "security",
+    "säkerhet": "security",
+}
+
+RATING_LABELS = {
+    "sv": {
+        "legal": "Juridik & GDPR",
+        "ip": "Immateriella rättigheter (IP)",
+        "cost": "Kostnadsmodell",
+        "security": "Informationssäkerhet",
+        "support": "Support & Tillgänglighet",
+        "green": "Inga kända väsentliga risker",
+        "yellow": "Risker eller villkor identifierade",
+        "red": "Betydande risker identifierade",
+        "grey": "Under utredning / partiell bedömning",
+        "missing": "Bedömning saknas",
+        "traffic_light": "Övergripande riskbild",
+    },
+    "en": {
+        "legal": "Legal & GDPR",
+        "ip": "Intellectual Property (IP)",
+        "cost": "Cost Model",
+        "security": "Information Security",
+        "support": "Support & Availability",
+        "green": "No significant known risks",
+        "yellow": "Risks or conditions identified",
+        "red": "Significant risks identified",
+        "grey": "Under review / partial assessment",
+        "missing": "Assessment unavailable",
+        "traffic_light": "Overall Risk Profile",
+    },
+}
+# Icons for modal collapsible sections
+SECTION_ICONS = {
+    # Svenska
+    "åtkomst": "material/key",
+    "om tjänsten": "material/book-open-page-variant",
+    "guider": "material/compass-outline",
+    "support": "material/help-circle-outline",
+    # Engelska
+    "access": "material/key",
+    "about the service": "material/book-open-page-variant",
+    "about": "material/book-open-page-variant",
+    "guides": "material/compass-outline",
+    "support": "material/help-circle-outline",
+}
+DEFAULT_SECTION_ICON = "material/text-box-outline"
+
+
+def _section_icon(title: str) -> str:
+    """Return an inlined SVG icon corresponding to the section title."""
+    clean_title = title.lower().strip()
+    icon_name = SECTION_ICONS.get(clean_title, DEFAULT_SECTION_ICON)
+    return _icon_html(icon_name)
+
+
+def normalize_ratings(raw_ratings: dict) -> dict[str, dict[str, str]]:
+    """Normalize rating keys, color values, and optional explanatory notes.
+    
+    Supports both compact format:
+        legal: green
+    and detailed format with note:
+        legal:
+          status: green
+          note: "Approved by KTH legal team."
+    """
+    if not isinstance(raw_ratings, dict):
+        return {}
+    normalized = {}
+    for key, val in raw_ratings.items():
+        clean_key = RATING_KEY_ALIASES.get(str(key).lower().strip(), str(key).lower().strip())
+        status_val = None
+        note_val = ""
+
+        if isinstance(val, dict):
+            raw_status = val.get("status") or val.get("color") or val.get("farg") or val.get("färg")
+            status_val = RATING_COLORS.get(str(raw_status).lower().strip()) if raw_status else None
+            raw_note = val.get("note") or val.get("kommentar") or val.get("beskrivning") or ""
+            note_val = str(raw_note).strip()
+        elif isinstance(val, str):
+            status_val = RATING_COLORS.get(val.lower().strip())
+
+        if status_val:
+            normalized[clean_key] = {"status": status_val, "note": note_val}
+    return normalized
+
+
+def calculate_overall_rating(ratings: dict[str, dict[str, str]]) -> str | None:
+    """Calculate overall traffic light badge:
+
+    1. If no ratings exist at all -> return None (no badge shown)
+    2. Any critical is red -> red
+    3. Any critical is yellow -> yellow
+    4. Any critical is grey or missing -> grey (partial assessment)
+    5. All critical are green -> green
+    """
+    if not ratings:
+        return None
+
+    critical_values = [
+        ratings[dim]["status"] if dim in ratings else None
+        for dim in CRITICAL_RATINGS
+    ]
+
+    # Red always surfaces immediately
+    if "red" in critical_values:
+        return "red"
+    # Yellow surfaces if no red
+    if "yellow" in critical_values:
+        return "yellow"
+    # If any critical dimension is missing or explicitly grey -> grey
+    if any(val is None or val == "grey" for val in critical_values):
+        return "grey"
+    # Only if all critical dimensions are green
+    if all(val == "green" for val in critical_values):
+        return "green"
+
+    return "grey"
+
+
 
 _FRONT_MATTER = re.compile(r"^---\s*\n(.*?)\n---\s*\n?", re.DOTALL)
-_NON_SLUG_CHARS = re.compile(r"[^a-z0-9]+")
 
 
-# --------------------------------------------------------------------------- #
-# Small helpers
-# --------------------------------------------------------------------------- #
-
-
-def _markdown_renderer() -> md_lib.Markdown:
-    """Create a fresh Markdown renderer.
-
-    A new instance per section is deliberate: python-markdown instances keep
-    state (footnotes, reference links) between conversions, which would leak
-    content from one service card into the next.
-    """
-    return md_lib.Markdown(extensions=MD_EXTENSIONS)
+def _md():
+    return md_lib.Markdown(
+        extensions=["admonition", "attr_list", "md_in_html", "tables", "pymdownx.details"]
+    )
 
 
 def _slug(value: str) -> str:
-    """Turn a human label into a stable identifier used in HTML and URLs.
-
-    The same function is used for dropdown option values, card `data-*`
-    attributes and tag values, which is what makes "click a tag" equal
-    "select that dropdown option" on the client side.
-    """
-    return _NON_SLUG_CHARS.sub("-", value.lower()).strip("-")
+    return re.sub(r"[^a-z0-9]+", "-", value.lower()).strip("-")
 
 
-def _as_list(value: Any) -> list[str]:
-    """Normalise a front matter value to a list of non-empty strings.
-
-    Editors may write either `data: Öppna data` or a YAML list; both must work.
-    """
+def _as_list(value) -> list:
     if value is None or value == "":
         return []
     if isinstance(value, (list, tuple)):
-        return [str(item) for item in value if str(item).strip()]
+        return [str(v) for v in value if str(v).strip()]
     return [str(value)]
 
 
 def _split_sections(body: str) -> list[tuple[str, str]]:
-    """Split a service file body into ``(heading, markdown)`` pairs on ``## ``.
-
-    Content before the first `##` heading is intentionally dropped: the card
-    summary comes from front matter, so stray prose above the first section
-    would have no place to go in the modal.
-    """
+    """Split the markdown body into (heading, markdown) pairs on '## '."""
     sections: list[tuple[str, str]] = []
-    current_title: str | None = None
+    current_title = None
     buffer: list[str] = []
     for line in body.splitlines():
-        if line.startswith(SECTION_PREFIX):
+        if line.startswith("## "):
             if current_title is not None:
                 sections.append((current_title, "\n".join(buffer).strip()))
-            current_title = line[len(SECTION_PREFIX):].strip()
+            current_title = line[3:].strip()
             buffer = []
-        elif current_title is not None:
+        else:
+            if current_title is None:
+                continue
             buffer.append(line)
     if current_title is not None:
         sections.append((current_title, "\n".join(buffer).strip()))
     return sections
 
 
-# --------------------------------------------------------------------------- #
-# Parsing service files
-# --------------------------------------------------------------------------- #
-
-
-def _build_tags(meta: dict[str, Any]) -> list[dict[str, str]]:
-    """Build the tag list for one service from its front matter.
-
-    Returns dicts of ``label`` (shown), ``kind`` (colour + which dropdown it
-    drives) and ``value`` (slug compared against the dropdown value).
-    """
-    tags: list[dict[str, str]] = []
-    for key, kind in TAG_GROUPS:
-        for label in _as_list(meta.get(key)):
-            tags.append({"label": label, "kind": kind, "value": _slug(label)})
-    return tags
-
-
-def _search_blob(service: dict[str, Any], tags: list[dict[str, str]]) -> str:
-    """Pre-compute the lowercase text the free-text search matches against.
-
-    Doing this at build time keeps the client-side search to a single
-    `indexOf` per card, which is why filtering stays instant without a search
-    library.
-    """
-    parts = [
-        service["name"],
-        service["provider"],
-        service["group"],
-        service["type"],
-        service["summary"],
-        service["access"],
-    ] + [tag["label"] for tag in tags]
-    return " ".join(parts).lower()
-
-
-def _parse_service(path: str, docs_dir: str) -> dict[str, Any] | None:
-    """Parse one service markdown file into the dict the renderers consume.
-
-    Args:
-        path: Absolute path to the service markdown file.
-        docs_dir: MkDocs `docs_dir`, used to record a readable source path.
-
-    Returns:
-        A service dict, or None when the file has no/unreadable front matter.
-
-    Side effects: reads the file and logs warnings for missing fields.
-    """
+def _parse_service(path: str, docs_dir: str) -> dict | None:
     with open(path, encoding="utf-8") as handle:
         raw = handle.read()
 
@@ -219,17 +233,32 @@ def _parse_service(path: str, docs_dir: str) -> dict[str, Any] | None:
         log.warning("services: could not read front matter in %s (%s)", path, exc)
         return None
 
-    for key in REQUIRED_FIELDS:
+    body = raw[match.end():]
+
+    for key in REQUIRED:
         if not meta.get(key):
             log.warning("services: %s is missing '%s' — rendered as '%s'", path, key, MISSING)
 
-    body = raw[match.end():]
-    filename = os.path.basename(path)
+    rel = os.path.relpath(path, docs_dir).replace(os.sep, "/")
+    # docs/en/knowledge_base/services/x.md -> ../knowledge_base/services/x/ from the overview page
+    url = re.sub(r"\.md$", "/", os.path.basename(path))
 
-    service: dict[str, Any] = {
-        "id": _slug(os.path.splitext(filename)[0]),
+    tags = []
+    for key, kind in TAG_GROUPS:
+        for label in _as_list(meta.get(key)):
+            tags.append({"label": label, "kind": kind, "value": _slug(label)})
+
+    sections = []
+    for title, section_md in _split_sections(body):
+        sections.append({"title": title, "html": _md().convert(section_md)})
+    raw_ratings = meta.get("rating") or meta.get("ratings") or {}
+    norm_ratings = normalize_ratings(raw_ratings)
+    overall_rating = calculate_overall_rating(norm_ratings)
+    
+    service = {
+        "id": _slug(os.path.splitext(os.path.basename(path))[0]),
         "name": meta.get("name") or MISSING,
-        "icon": meta.get("icon") or DEFAULT_ICON,
+        "icon": meta.get("icon") or "material/apps",
         "provider": meta.get("provider") or MISSING,
         "group": meta.get("group") or MISSING,
         "type": meta.get("type") or "",
@@ -237,55 +266,42 @@ def _parse_service(path: str, docs_dir: str) -> dict[str, Any] | None:
         "access": meta.get("access") or MISSING,
         "link": meta.get("link") or "",
         "link_login": bool(meta.get("link_requires_login")),
-        # Service pages sit next to the overview page, so a relative
-        # "<name>/" link works in both languages and under a sub-path deploy.
-        "page": re.sub(r"\.md$", "/", filename),
-        "tags": _build_tags(meta),
-        "sections": [
-            {"title": title, "html": _markdown_renderer().convert(section_md)}
-            for title, section_md in _split_sections(body)
-        ],
-        "source": os.path.relpath(path, docs_dir).replace(os.sep, "/"),
+        "ratings": norm_ratings,           # <-- LÄGG TILL DETTA
+        "overall_rating": overall_rating,   # <-- LÄGG TILL DETTA
+        "page": url,
+        "tags": tags,
+        "sections": sections,
+        "source": rel,
     }
-    service["search"] = _search_blob(service, service["tags"])
+
+    service["search"] = " ".join(
+        [service["name"], service["provider"], service["group"], service["type"],
+         service["summary"], service["access"]]
+        + [t["label"] for t in tags]
+    ).lower()
     return service
 
 
-def _collect(page: Any, config: Any) -> list[dict[str, Any]]:
-    """Collect every service defined next to the overview page.
-
-    Sorted by provider then name so the grid order is stable between builds
-    (a changing order would produce noisy diffs in the generated site).
-    """
+def _collect(page, config) -> list[dict]:
     docs_dir = config["docs_dir"]
-    services_dir = os.path.dirname(os.path.join(docs_dir, page.file.src_path))
+    page_dir = os.path.dirname(os.path.join(docs_dir, page.file.src_path))
+    services_dir = page_dir
     if not os.path.isdir(services_dir):
         return []
 
-    services: list[dict[str, Any]] = []
-    for filename in sorted(os.listdir(services_dir)):
-        if not filename.endswith(".md"):
+    services = []
+    for name in sorted(os.listdir(services_dir)):
+        if not name.endswith(".md") or name.startswith("_") or name == "index.md":
             continue
-        if filename.startswith(SKIPPED_PREFIX) or filename in SKIPPED_FILENAMES:
-            continue
-        service = _parse_service(os.path.join(services_dir, filename), docs_dir)
+        service = _parse_service(os.path.join(services_dir, name), docs_dir)
         if service:
             services.append(service)
     services.sort(key=lambda s: (s["provider"].lower(), s["name"].lower()))
     return services
 
 
-# --------------------------------------------------------------------------- #
-# HTML rendering
-# --------------------------------------------------------------------------- #
-
-
 def _icon_html(icon: str) -> str:
-    """Inline a Material icon SVG.
-
-    The markup is emitted as raw HTML, so the usual `:material-icon:` shortcode
-    is not processed here — the SVG has to be inlined directly.
-    """
+    """Inline the Material icon SVG so it renders inside raw HTML blocks."""
     try:
         import material
 
@@ -294,18 +310,14 @@ def _icon_html(icon: str) -> str:
         if os.path.isfile(path):
             with open(path, encoding="utf-8") as handle:
                 return f'<span class="svc-icon">{handle.read()}</span>'
-    except Exception:  # pragma: no cover - the icon is decorative only
+    except Exception:  # pragma: no cover - icon is decorative
         pass
     log.warning("services: icon '%s' not found", icon)
     return '<span class="svc-icon"></span>'
 
 
-def _tag_html(tag: dict[str, str]) -> str:
-    """Render one clickable tag.
 
-    A real `<button>` (not a span) so it is reachable by keyboard and exposed
-    to screen readers; the JS reads `data-tag-kind`/`data-tag-value`.
-    """
+def _tag_html(tag: dict) -> str:
     return (
         f'<button type="button" class="svc-tag svc-tag--{tag["kind"]}" '
         f'data-tag-kind="{tag["kind"]}" data-tag-value="{html.escape(tag["value"], quote=True)}">'
@@ -314,35 +326,34 @@ def _tag_html(tag: dict[str, str]) -> str:
 
 
 def _value_html(value: str) -> str:
-    """Escape a value, marking up the "missing information" placeholder."""
     if value == MISSING:
         return f'<span class="svc-missing">{MISSING}</span>'
     return html.escape(value)
 
 
-def _attr(value: str) -> str:
-    """Escape a string for use inside a double-quoted HTML attribute."""
-    return html.escape(value, quote=True)
+def _card_html(service: dict, lang: str = "sv") -> str:
+    tags = "".join(_tag_html(t) for t in service["tags"])
+    
+    traffic_html = ""
+    color = service.get("overall_rating")
+    if color:
+        labels = RATING_LABELS.get(lang, RATING_LABELS["sv"])
+        desc = labels.get(color, color)
+        traffic_html = (
+    f'<span class="svc-traffic-badge svc-traffic-badge--{color}" '
+    f'title="{labels["traffic_light"]}: {desc}"></span>'
+)
 
-
-def _card_html(service: dict[str, Any]) -> str:
-    """Render one grid card.
-
-    The `data-provider` / `data-group` / `data-type` attributes hold slugs that
-    are compared against the dropdown values, and `data-search` holds the
-    pre-computed search blob. All filtering reads these attributes, so the card
-    markup is the single source of truth for what is filterable.
-    """
-    tags = "".join(_tag_html(tag) for tag in service["tags"])
-    tag_values = " ".join(tag["value"] for tag in service["tags"])
     return f"""<article class="svc-card" id="svc-card-{service['id']}"
   data-id="{service['id']}"
-  data-provider="{_attr(_slug(service['provider']))}"
-  data-group="{_attr(_slug(service['group']))}"
-  data-type="{_attr(_slug(service['type']))}"
-  data-tags="{_attr(tag_values)}"
-  data-search="{_attr(service['search'])}">
+  data-provider="{html.escape(_slug(service['provider']), quote=True)}"
+  data-group="{html.escape(_slug(service['group']), quote=True)}"
+  data-type="{html.escape(_slug(service['type']), quote=True)}"
+  data-rating="{color or ''}"
+  data-tags="{html.escape(' '.join(t['value'] for t in service['tags']), quote=True)}"
+  data-search="{html.escape(service['search'], quote=True)}">
   <button type="button" class="svc-card__open" data-open="{service['id']}">
+    {traffic_html}
     <span class="svc-card__icon">{_icon_html(service['icon'])}</span>
     <span class="svc-card__title">{html.escape(service['name'])}</span>
     <span class="svc-card__provider">{_value_html(service['provider'])}</span>
@@ -352,9 +363,8 @@ def _card_html(service: dict[str, Any]) -> str:
 </article>"""
 
 
-#: All user-facing strings, keyed by language. Kept here rather than in the
-#: markdown pages so the two languages cannot drift apart structurally.
-LABELS: dict[str, dict[str, str]] = {
+
+LABELS = {
     "sv": {
         "login": " (kräver inloggning)",
         "to_service": "Till tjänsten",
@@ -391,138 +401,152 @@ LABELS: dict[str, dict[str, str]] = {
     },
 }
 
-DEFAULT_LANG = "en"
-SWEDISH_PREFIX = "sv/"
 
-
-def _modal_sections_html(service: dict[str, Any]) -> str:
-    """Render the expandable Access / Guides / About sections of a modal."""
-    return "".join(
-        f'<details class="svc-section"><summary>{html.escape(section["title"])}</summary>'
-        f'<div class="svc-section__body">{section["html"]}</div></details>'
-        for section in service["sections"]
+def _modal_html(service: dict, t: dict, lang: str = "sv") -> str:
+    tags = "".join(_tag_html(x) for x in service["tags"])
+    sections = "".join(
+        f'<details class="svc-section">'
+        f'<summary>'
+        f'{_section_icon(s["title"])}'
+        f'<span class="svc-section__title">{html.escape(s["title"])}</span>'
+        f'</summary>'
+        f'<div class="svc-section__body">{s["html"]}</div>'
+        f'</details>'
+        for s in service["sections"]
     )
 
-
-def _modal_actions_html(service: dict[str, Any], labels: dict[str, str]) -> str:
-    """Render the modal's action buttons.
-
-    "About the service" always exists (it is the generated service page); the
-    external link is optional and is annotated when sign-in is required, so a
-    researcher knows before clicking.
-    """
-    external = ""
+    link = ""
     if service["link"]:
-        login_note = labels["login"] if service["link_login"] else ""
-        external = (
-            f'<a class="svc-btn svc-btn--primary" href="{_attr(service["link"])}">'
-            f'{labels["to_service"]}{login_note}</a>'
+        login = t["login"] if service["link_login"] else ""
+        link = (
+            f'<a class="svc-btn svc-btn--primary" href="{html.escape(service["link"], quote=True)}">'
+            f'{t["to_service"]}{login}</a>'
         )
-    return (
-        f'<a class="svc-btn" href="{service["page"]}">{labels["about"]}</a>\n      {external}'
-    )
+
+    # Build expandable risk profile if ratings exist
+    ratings_html = ""
+    norm_ratings = service.get("ratings", {})
+    if norm_ratings:
+        labels = RATING_LABELS.get(lang, RATING_LABELS["sv"])
+        overall_color = service.get("overall_rating") or "grey"
+        overall_desc = labels.get(overall_color, labels["missing"])
+
+        rows = []
+        all_dimensions = CRITICAL_RATINGS + NON_CRITICAL_RATINGS
+        for dim in all_dimensions:
+            dim_title = labels.get(dim, dim.capitalize())
+            dim_val = norm_ratings.get(dim)
+
+            if isinstance(dim_val, dict):
+                color = dim_val.get("status")
+                note = dim_val.get("note", "")
+            elif isinstance(dim_val, str):
+                color = dim_val
+                note = ""
+            else:
+                color = None
+                note = ""
+
+            if color:
+                color_label = labels.get(color, color)
+                badge_class = f"svc-traffic-badge--{color}"
+            else:
+                color_label = labels.get("missing", "Missing")
+                badge_class = "svc-traffic-badge--missing"
+
+            note_html = (
+                f'<p class="svc-modal__rating-note">{html.escape(note)}</p>'
+                if note else ""
+            )
+
+            rows.append(
+                f'<div class="svc-modal__rating-item">'
+                f'<div class="svc-modal__rating-header">'
+                f'<span class="svc-traffic-badge {badge_class}"></span>'
+                f'<span class="svc-modal__rating-dim">{dim_title}</span>'
+                f'<span class="svc-modal__rating-val">{color_label}</span>'
+                f'</div>'
+                f'{note_html}'
+                f'</div>'
+            )
+
+        ratings_html = (
+            f'<details class="svc-modal__ratings-details">'
+            f'<summary class="svc-modal__ratings-summary">'
+            f'<span class="svc-traffic-badge svc-traffic-badge--{overall_color}"></span>'
+            f'<span class="svc-modal__ratings-summary-text">'
+            f'<strong>{labels["traffic_light"]}:</strong> {overall_desc}'
+            f'</span>'
+            f'</summary>'
+            f'<div class="svc-modal__rating-list">{"".join(rows)}</div>'
+            f'</details>'
+        )
 
 
-def _modal_html(service: dict[str, Any], labels: dict[str, str]) -> str:
-    """Render the modal window for one service.
 
-    Modals are rendered for every service up front (hidden) rather than built
-    on demand: the content is static, and pre-rendering keeps the JavaScript
-    free of any templating.
-    """
-    tags = "".join(_tag_html(tag) for tag in service["tags"])
     return f"""<div class="svc-modal" id="svc-modal-{service['id']}" role="dialog" aria-modal="true"
   aria-labelledby="svc-modal-title-{service['id']}" hidden>
   <div class="svc-modal__backdrop" data-close="{service['id']}"></div>
   <div class="svc-modal__panel">
-    <button type="button" class="svc-modal__close" data-close="{service['id']}" aria-label="{labels['close']}">&times;</button>
+    <button type="button" class="svc-modal__close" data-close="{service['id']}" aria-label="{t['close']}">&times;</button>
     <p class="svc-modal__icon">{_icon_html(service['icon'])}</p>
     <h2 class="svc-modal__title" id="svc-modal-title-{service['id']}">{html.escape(service['name'])}</h2>
     <p class="svc-modal__provider">{_value_html(service['provider'])}</p>
     <p class="svc-modal__summary">{_value_html(service['summary'])}</p>
     <div class="svc-modal__tags">{tags}</div>
-    <div class="svc-modal__sections">{_modal_sections_html(service)}</div>
+    {ratings_html}
+    <div class="svc-modal__sections">{sections}</div>
     <div class="svc-modal__actions">
-      {_modal_actions_html(service, labels)}
+      <a class="svc-btn" href="{service['page']}">{t['about']}</a>
+      {link}
     </div>
   </div>
 </div>"""
 
 
-def _options(values: Iterable[str]) -> str:
-    """Render dropdown `<option>`s, de-duplicated by slug and sorted by label.
-
-    The dropdowns are derived from the service files themselves — adding a new
-    provider or function group in a markdown file is all it takes for it to
-    appear as a filter. MISSING is skipped: "uppgift saknas" is not a filter.
-    """
-    seen: dict[str, str] = {}
+def _options(values) -> str:
+    seen = {}
     for label in values:
         if label and label != MISSING:
             seen.setdefault(_slug(label), label)
     return "".join(
-        f'<option value="{_attr(value)}">{html.escape(label)}</option>'
-        for value, label in sorted(seen.items(), key=lambda item: item[1].lower())
+        f'<option value="{html.escape(value, quote=True)}">{html.escape(label)}</option>'
+        for value, label in sorted(seen.items(), key=lambda kv: kv[1].lower())
     )
 
 
-def _filters_html(services: list[dict[str, Any]], labels: dict[str, str]) -> str:
-    """Render the search field, the three dropdowns and the clear button.
-
-    `onsubmit="return false"` keeps Enter in the search field from reloading
-    the page — filtering is live on input.
-    """
-    providers = _options(service["provider"] for service in services)
-    groups = _options(service["group"] for service in services)
-    types = _options(service["type"] for service in services)
-    return f"""<form class="svc-filters" role="search" onsubmit="return false;">
-    <input type="search" class="svc-filters__search" name="q" placeholder="{labels['search']}" aria-label="{labels['search_label']}">
-    <select name="provider" aria-label="{labels['provider']}"><option value="">{labels['provider']}</option>{providers}</select>
-    <select name="group" aria-label="{labels['group']}"><option value="">{labels['group']}</option>{groups}</select>
-    <select name="type" aria-label="{labels['type']}"><option value="">{labels['type']}</option>{types}</select>
-    <button type="button" class="svc-filters__reset" disabled>{labels['reset']}</button>
-  </form>"""
-
-
-def _archive_html(services: list[dict[str, Any]], labels: dict[str, str]) -> str:
-    """Render the complete archive block that replaces the marker."""
+def _archive_html(services: list[dict], t: dict, lang: str = "sv") -> str:
     if not services:
-        return f'<p class="svc-empty">{labels["empty"]}</p>'
-
-    cards = "".join(_card_html(service) for service in services)
-    modals = "".join(_modal_html(service, labels) for service in services)
+        return f'<p class="svc-empty">{t["empty"]}</p>'
+    providers = _options(s["provider"] for s in services)
+    groups = _options(s["group"] for s in services)
+    types = _options(s["type"] for s in services)
+    cards = "".join(_card_html(s, lang) for s in services)
+    modals = "".join(_modal_html(s, t, lang) for s in services)
 
     return f"""<div class="svc-archive" data-count="{len(services)}"
-  data-label-of="{labels['of']}" data-label-items="{labels['items']}">
-  {_filters_html(services, labels)}
+  data-label-of="{t['of']}" data-label-items="{t['items']}">
+  <form class="svc-filters" role="search" onsubmit="return false;">
+    <input type="search" class="svc-filters__search" name="q" placeholder="{t['search']}" aria-label="{t['search_label']}">
+    <select name="provider" aria-label="{t['provider']}"><option value="">{t['provider']}</option>{providers}</select>
+    <select name="group" aria-label="{t['group']}"><option value="">{t['group']}</option>{groups}</select>
+    <select name="type" aria-label="{t['type']}"><option value="">{t['type']}</option>{types}</select>
+    <button type="button" class="svc-filters__reset" disabled>{t['reset']}</button>
+  </form>
   <p class="svc-count" aria-live="polite"></p>
   <div class="svc-grid">{cards}</div>
-  <p class="svc-noresults" hidden>{labels['noresults']}</p>
+  <p class="svc-noresults" hidden>{t['noresults']}</p>
   <div class="svc-modals">{modals}</div>
 </div>"""
 
 
-# --------------------------------------------------------------------------- #
-# MkDocs entry point
-# --------------------------------------------------------------------------- #
-
-
-def on_page_markdown(markdown: str, page: Any, config: Any, files: Any, **kwargs: Any) -> str:
-    """MkDocs hook: replace the archive marker with the generated catalogue.
-
-    Args:
-        markdown: The page source. Returned unchanged unless it holds MARKER.
-        page: The MkDocs page; its `file.src_path` gives both the language and
-            the folder to scan for service files.
-        config: The MkDocs config, used for `docs_dir`.
-        files: Unused; part of the MkDocs hook signature.
-
-    Returns:
-        The page markdown, with the marker replaced by raw HTML.
-    """
+def on_page_markdown(markdown, page, config, files, **kwargs):
     if MARKER not in markdown:
         return markdown
     src = page.file.src_path.replace(os.sep, "/")
-    lang = "sv" if src.startswith(SWEDISH_PREFIX) else DEFAULT_LANG
+    lang = "sv" if src.startswith("sv/") else "en"
     services = _collect(page, config)
-    return markdown.replace(MARKER, _archive_html(services, LABELS[lang]))
+    return markdown.replace(MARKER, _archive_html(services, LABELS[lang], lang))
+
+
+
