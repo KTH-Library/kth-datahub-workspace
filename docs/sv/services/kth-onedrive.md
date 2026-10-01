@@ -6,10 +6,30 @@ group: Datahantering
 type: Lagring
 data: Arbetsmaterial
 location: EU
-summary: Personlig och delad molnlagring som ingår i KTH:s Microsoft 365-avtal, lämplig för löpande arbetsmaterial.
-access: Tillgänglig för alla anställda och studenter med KTH-konto.
+summary: >
+  Personlig och delad molnlagring som ingår i KTH:s
+  Microsoft 365-avtal, lämplig för löpande arbetsmaterial.
+access: >
+  Tillgänglig för alla anställda och studenter med
+  KTH-konto.
 link: https://intra.kth.se/it/lagring
 link_requires_login: false
+rating:
+  legal:
+    status: green
+    note: >
+      Provided through a centrally managed institutional service.
+  ip: green
+  security:
+    status: green
+    note: >
+      Integrated with institutional identity management and security controls.
+  cost:
+    status: green
+    note: Included as part of centrally funded services.
+  support:
+    status: green
+    note: Supported by the central IT organisation.
 ---
 
 ## Åtkomst

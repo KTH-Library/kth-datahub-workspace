@@ -6,10 +6,20 @@ group: FAIR-resurser
 type: Publicering
 data: Öppna data
 location: EU
-summary: General purpose repository for publishing datasets, software and other research output with a DOI.
-access: Open to anyone; log in with ORCID, GitHub or a Zenodo account.
+summary: >
+   General-purpose repository for publishing datasets, software and other
+   research output with a DOI.
+access: >
+  Open to anyone; log in with ORCID, GitHub or
+  a Zenodo account.
 link: https://zenodo.org
 link_requires_login: false
+rating:
+  legal:    green
+  ip:       green
+  security: green
+  cost:     green
+  support:  yellow
 ---
 
 ## Access

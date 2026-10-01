@@ -7,9 +7,26 @@ type: Versionshantering
 data: Kod
 location: Globalt
 summary: Version control and collaboration for code, analysis scripts and documentation, with a KTH organisation available.
-access: Free accounts for anyone; KTH-Library and other KTH organisations host institutional repositories.
+access: Free accounts for anyone; KTH Library and other KTH organisations host institutional repositories.
 link: https://github.com/KTH-Library
 link_requires_login: false
+rating:
+  legal:
+    status: yellow
+    note: >
+      Suitable for source code and collaborative development.
+      Sensitive personal information and regulated data require separate assessment.
+  ip:
+    status: yellow
+    note: >
+      Users should understand licence terms, ownership arrangements, and
+      the rights associated with external contributions.
+  security:
+    status: green
+    note: >
+      Supports multi-factor authentication and institutional identity integration.
+  cost: green
+  support: yellow
 ---
 
 ## Access

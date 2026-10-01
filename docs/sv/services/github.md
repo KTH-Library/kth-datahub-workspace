@@ -6,10 +6,33 @@ group: Datahantering
 type: Versionshantering
 data: Kod
 location: Globalt
-summary: Versionshantering och samarbete kring kod, analysskript och dokumentation, med KTH-organisationer tillgängliga.
-access: Kostnadsfria konton för alla; KTH-Library och andra KTH-organisationer rymmer institutionella repositorier.
+summary: >
+  Versionshantering och samarbete kring kod,
+  analysskript och dokumentation, med
+  KTH-organisationer tillgängliga.
+access: >
+  Kostnadsfria konton för alla; KTH-Library och
+  andra KTH-organisationer rymmer institutionella
+  repositorier.
 link: https://github.com/KTH-Library
 link_requires_login: false
+rating:
+  legal:
+    status: yellow
+    note: >
+      Suitable for source code and collaborative development.
+      Sensitive personal information and regulated data require separate assessment.
+  ip:
+    status: yellow
+    note: >
+      Users should understand licence terms, ownership arrangements, and
+      the rights associated with external contributions.
+  security:
+    status: green
+    note: >
+      Supports multi-factor authentication and institutional identity integration.
+  cost: green
+  support: yellow
 ---
 
 ## Åtkomst

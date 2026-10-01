@@ -6,10 +6,31 @@ group: Datahantering
 type: Lagring
 data: Arbetsmaterial
 location: EU
-summary: Personal and shared cloud storage included in the KTH Microsoft 365 agreement, suited for day-to-day working files.
-access: Available to all staff and students with a KTH account.
+summary: >
+  Personal and shared cloud storage included in
+  the KTH Microsoft 365 agreement, suited for
+  day-to-day working files.
+access: >
+  Available to all staff and students with
+  a KTH account.
 link: https://intra.kth.se/it/lagring
 link_requires_login: false
+rating:
+  legal:
+    status: green
+    note: >
+      Provided through a centrally managed institutional service.
+  ip: green
+  security:
+    status: green
+    note: >
+      Integrated with institutional identity management and security controls.
+  cost:
+    status: green
+    note: Included as part of centrally funded services.
+  support:
+    status: green
+    note: Supported by the central IT organisation.
 ---
 
 ## Access

@@ -6,10 +6,18 @@ group: Datahantering
 type: Lagring
 data: Arbetsmaterial
 location: Globalt
-summary: Commercial file sync and sharing, common in external collaborations but not covered by a central KTH agreement.
+summary: >
+   Commercial file sync and sharing, common in external collaborations but
+   not covered by a central KTH agreement.
 access: Personal or project-funded subscription; no KTH-wide agreement.
 link: https://www.dropbox.com
 link_requires_login: false
+rating:
+  legal:    red
+  ip:       yellow
+  security: red
+  cost:     yellow
+  support:  yellow
 ---
 
 ## Access

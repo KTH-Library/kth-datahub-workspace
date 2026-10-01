@@ -6,10 +6,18 @@ group: Molntjänster och beräkning
 type: Lagring
 data: Forskningsdata
 location: EU
-summary: European Open Science Cloud storage and compute for project data, including Jupyter notebooks close to the data.
-access: Log in with your KTH account through the EOSC EU Node; a free allocation is included.
+summary: >
+   European Open Science Cloud storage and compute for project data, including
+   Jupyter notebooks close to the data.
+access: >
+   Log in with your KTH account through the EOSC EU Node;
+   a free allocation is included.
 link: https://open-science-cloud.ec.europa.eu
 link_requires_login: true
+rating:
+  legal:   green
+  cost:    green
+  support: yellow
 ---
 
 ## Access
