@@ -599,9 +599,11 @@ def _archive_html(services: list[dict], t: dict, lang: str = "sv") -> str:
     types = _options(s["type"] for s in services)
     cards = "".join(_card_html(s, lang) for s in services)
     modals = "".join(_modal_html(s, t, lang) for s in services)
+    type_tabs = _type_tabs_html(services, lang)
 
     return f"""<div class="svc-archive" data-count="{len(services)}"
   data-label-of="{t['of']}" data-label-items="{t['items']}">
+  {type_tabs}
   <form class="svc-filters" role="search" onsubmit="return false;">
     <input type="search" class="svc-filters__search" name="q" placeholder="{t['search']}" aria-label="{t['search_label']}">
     <select name="provider" aria-label="{t['provider']}"><option value="">{t['provider']}</option>{providers}</select>
@@ -614,6 +616,50 @@ def _archive_html(services: list[dict], t: dict, lang: str = "sv") -> str:
   <p class="svc-noresults" hidden>{t['noresults']}</p>
   <div class="svc-modals">{modals}</div>
 </div>"""
+
+
+def _type_tabs_html(services: list[dict], lang: str) -> str:
+    counts = {"all": len(services), "service": 0, "guide": 0, "checklist": 0, "support": 0}
+    for s in services:
+        t = s.get("type", "service")
+        if t in counts:
+            counts[t] += 1
+
+    labels = {
+        "en": {
+            "all": "All resources",
+            "service": "Services & Tools",
+            "guide": "Guides",
+            "checklist": "Checklists",
+            "support": "Support & Advice"
+        },
+        "sv": {
+            "all": "Alla resurser",
+            "service": "Tjänster & Verktyg",
+            "guide": "Guider",
+            "checklist": "Checklistor",
+            "support": "Stöd & Rådgivning"
+        }
+    }.get(lang, {"all": "All resources", "service": "Services & Tools", "guide": "Guides", "checklist": "Checklists", "support": "Support & Advice"})
+
+    buttons = []
+    for t in ["all", "service", "guide", "checklist", "support"]:
+        # Visa fliken om det är "all" eller om det finns kort av den typen
+        if t != "all" and counts.get(t, 0) == 0:
+            continue
+            
+        active = " is-active" if t == "all" else ""
+        label = labels.get(t, t.title())
+        count = counts.get(t, 0)
+        
+        buttons.append(
+            f'<button type="button" class="svc-type-tab svc-type-tab--{t}{active}" data-filter-type="{t}">'
+            f'<span class="svc-type-tab__label">{label}</span>'
+            f'<span class="svc-type-tab__count">{count}</span>'
+            f'</button>'
+        )
+
+    return f'<div class="svc-type-tabs" role="tablist">{"".join(buttons)}</div>'
 
 
 def on_page_markdown(markdown, page, config, files, **kwargs):
