@@ -57,6 +57,20 @@
     var cards = Array.prototype.slice.call(archive.querySelectorAll(".svc-card"));
     var count = archive.querySelector(".svc-count");
     var noresults = archive.querySelector(".svc-noresults");
+    var typeTabs = Array.prototype.slice.call(archive.querySelectorAll(".svc-type-tab"));
+
+    function syncTypeTabs(activeType) {
+      var current = activeType || "all";
+      typeTabs.forEach(function (tab) {
+        var tabType = tab.dataset.filterType;
+        if (tabType === current) {
+          tab.classList.add("is-active");
+        } else {
+          tab.classList.remove("is-active");
+        }
+      });
+    }
+
     /* Element that had focus before a modal opened, so focus can be restored
        when it closes (keyboard and screen-reader users would otherwise be
        dropped back at the top of the document). */
@@ -109,6 +123,8 @@
       var dirty = !!search.value || !!selects.provider.value ||
         !!selects.group.value || !!selects.type.value;
       reset.disabled = !dirty;
+
+      syncTypeTabs(selects.type.value); // <-- LÄGG TILL DENNA RAD HÄR!
 
       if (pushState !== false) writeUrl();
     }
@@ -222,7 +238,7 @@
       }
     });
 
-    search.addEventListener("input", function () { apply(); });
+     search.addEventListener("input", function () { apply(); });
     Object.keys(selects).forEach(function (key) {
       selects[key].addEventListener("change", function () { apply(); });
     });
@@ -231,6 +247,15 @@
       Object.keys(selects).forEach(function (key) { selects[key].value = ""; });
       apply();
     });
+     typeTabs.forEach(function (tab) {
+      tab.addEventListener("click", function () {
+        var t = tab.dataset.filterType;
+        selects.type.value = (t === "all") ? "" : t;
+        apply();
+      });
+    });
+
+
 
     /* ---- restore state from the URL ------------------------------------ */
 
