@@ -271,6 +271,7 @@ def _parse_service(path: str, docs_dir: str) -> dict | None:
         "page": url,
         "tags": tags,
         "sections": sections,
+        "related": _as_list(meta.get("related")),
         "source": rel,
     }
 
@@ -301,7 +302,37 @@ def _collect(page, config) -> list[dict]:
                 services.append(service)
 
     services.sort(key=lambda s: (s["provider"].lower(), s["name"].lower()))
+    _link_relations(services)
     return services
+
+    
+    return services
+
+def _link_relations(services: list[dict]) -> None:
+    """Resolve bidirectional relations between cards."""
+    by_id = {s["id"]: s for s in services}
+
+    # 1. Korskoppla: Om A länkar till B, se till att B också länkar till A
+    for s in services:
+        for target_id in list(s.get("related", [])):
+            if target_id in by_id:
+                target = by_id[target_id]
+                if s["id"] not in target["related"]:
+                    target["related"].append(s["id"])
+
+    # 2. Skapa färdiga objekt så modalen enkelt kan rita ut knapparna
+    for s in services:
+        s["related_items"] = [
+            {
+                "id": rid,
+                "name": by_id[rid]["name"],
+                "type": by_id[rid].get("type", "service"),
+                "icon": by_id[rid]["icon"],
+            }
+            for rid in s.get("related", [])
+            if rid in by_id and rid != s["id"]
+        ]
+
 
 def _icon_html(icon: str) -> str:
     """Inline the Material icon SVG so it renders inside raw HTML blocks."""
@@ -443,6 +474,24 @@ def _modal_html(service: dict, t: dict, lang: str = "sv") -> str:
             f'target="_blank" rel="noopener noreferrer">{btn_text}</a>'
         )
 
+    related_html = ""
+    if service.get("related_items"):
+        rel_label = "Relaterat innehåll" if lang == "sv" else "Related resources"
+        rel_btns = []
+        for rel in service["related_items"]:
+            rel_btns.append(
+                f'<button type="button" class="svc-modal__related-btn svc-modal__related-btn--{rel["type"]}" data-open="{rel["id"]}">'
+                f'<span class="svc-modal__related-icon">{_icon_html(rel["icon"])}</span>'
+                f'<span class="svc-modal__related-name">{html.escape(rel["name"])}</span>'
+                f'</button>'
+            )
+        related_html = (
+            f'<div class="svc-modal__related">'
+            f'<h4>{rel_label}</h4>'
+            f'<div class="svc-modal__related-items">{"".join(rel_btns)}</div>'
+            f'</div>'
+        )
+
 
     # Build expandable risk profile if ratings exist
     ratings_html = ""
@@ -517,6 +566,7 @@ def _modal_html(service: dict, t: dict, lang: str = "sv") -> str:
     <div class="svc-modal__tags">{tags}</div>
     {ratings_html}
     <div class="svc-modal__sections">{sections}</div>
+    {related_html}
     <div class="svc-modal__actions">
       {link}
     </div>
