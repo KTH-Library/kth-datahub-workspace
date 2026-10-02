@@ -570,3 +570,130 @@
 
 /* Prevents the page behind an open modal from scrolling. */
 body.svc-modal-open { overflow: hidden; }
+
+/* --- Relaterade resurser / Miniatyrkort i modalen --- */
+
+.svc-modal__related {
+  margin-top: 1.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--md-default-fg-color--lightest);
+}
+
+.svc-modal__related h4 {
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--md-default-fg-color--light);
+  margin: 0 0 0.8rem;
+}
+
+.svc-modal__related-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+  gap: 0.75rem;
+}
+
+.svc-mini-card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
+  padding: 0.75rem 0.9rem;
+  border-radius: 0.4rem;
+  border: 1px solid var(--md-default-fg-color--lighter);
+  background: var(--md-default-bg-color);
+  cursor: pointer;
+  transition: transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+  width: 100%;
+}
+
+.svc-mini-card:hover {
+  transform: translateY(-2px);
+  border-color: var(--md-accent-fg-color);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+}
+
+.svc-mini-card__header {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  gap: 0.45rem;
+  margin-bottom: 0.4rem;
+}
+
+.svc-mini-card__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.2rem;
+  height: 1.2rem;
+}
+
+.svc-mini-card__icon svg {
+  width: 1.1rem;
+  height: 1.1rem;
+  fill: currentColor;
+}
+
+.svc-mini-card__type {
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.svc-mini-card__arrow {
+  margin-left: auto;
+  font-size: 0.85rem;
+  opacity: 0.4;
+  transition: transform 0.15s ease, opacity 0.15s ease;
+}
+
+.svc-mini-card:hover .svc-mini-card__arrow {
+  opacity: 1;
+  transform: translateX(3px);
+}
+
+.svc-mini-card__title {
+  font-size: 0.82rem;
+  font-weight: 600;
+  line-height: 1.35;
+  color: var(--md-default-fg-color);
+}
+
+/* Färgkodning per korttyp */
+.svc-mini-card--service .svc-mini-card__icon,
+.svc-mini-card--service .svc-mini-card__type { color: #1954a6; }
+
+.svc-mini-card--guide .svc-mini-card__icon,
+.svc-mini-card--guide .svc-mini-card__type { color: #7c3aed; }
+
+.svc-mini-card--checklist .svc-mini-card__icon,
+.svc-mini-card--checklist .svc-mini-card__type { color: #d97706; }
+
+.svc-mini-card--support .svc-mini-card__icon,
+.svc-mini-card--support .svc-mini-card__type { color: #0d9488; }
+
+/* Slate / Dark Mode */
+[data-md-color-scheme="slate"] .svc-mini-card {
+  background: rgba(255, 255, 255, 0.03);
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
+[data-md-color-scheme="slate"] .svc-mini-card:hover {
+  background: rgba(255, 255, 255, 0.07);
+  border-color: rgba(255, 255, 255, 0.35);
+}
+
+[data-md-color-scheme="slate"] .svc-mini-card--service .svc-mini-card__icon,
+[data-md-color-scheme="slate"] .svc-mini-card--service .svc-mini-card__type { color: #60a5fa; }
+
+[data-md-color-scheme="slate"] .svc-mini-card--guide .svc-mini-card__icon,
+[data-md-color-scheme="slate"] .svc-mini-card--guide .svc-mini-card__type { color: #a78bfa; }
+
+[data-md-color-scheme="slate"] .svc-mini-card--checklist .svc-mini-card__icon,
+[data-md-color-scheme="slate"] .svc-mini-card--checklist .svc-mini-card__type { color: #fbbf24; }
+
+[data-md-color-scheme="slate"] .svc-mini-card--support .svc-mini-card__icon,
+[data-md-color-scheme="slate"] .svc-mini-card--support .svc-mini-card__type { color: #2dd4bf; }
