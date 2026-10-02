@@ -25,6 +25,7 @@ hooks:
 # Service pages are rendered through the services overview page, not the nav
 not_in_nav: |
   */services/*.md
+  */services/*/*.md
 
 theme:
   name: material
