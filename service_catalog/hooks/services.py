@@ -477,20 +477,26 @@ def _modal_html(service: dict, t: dict, lang: str = "sv") -> str:
     related_html = ""
     if service.get("related_items"):
         rel_label = "Relaterat innehåll" if lang == "sv" else "Related resources"
-        rel_btns = []
+        rel_cards = []
         for rel in service["related_items"]:
-            rel_btns.append(
-                f'<button type="button" class="svc-modal__related-btn svc-modal__related-btn--{rel["type"]}" data-open="{rel["id"]}">'
-                f'<span class="svc-modal__related-icon">{_icon_html(rel["icon"])}</span>'
-                f'<span class="svc-modal__related-name">{html.escape(rel["name"])}</span>'
+            card_type = rel.get("type", "service")
+            rel_cards.append(
+                f'<button type="button" class="svc-mini-card svc-mini-card--{card_type}" data-open="{rel["id"]}">'
+                f'<div class="svc-mini-card__header">'
+                f'<span class="svc-mini-card__icon">{_icon_html(rel["icon"])}</span>'
+                f'<span class="svc-mini-card__type">{html.escape(card_type.capitalize())}</span>'
+                f'<span class="svc-mini-card__arrow">&rarr;</span>'
+                f'</div>'
+                f'<div class="svc-mini-card__title">{html.escape(rel["name"])}</div>'
                 f'</button>'
             )
         related_html = (
             f'<div class="svc-modal__related">'
             f'<h4>{rel_label}</h4>'
-            f'<div class="svc-modal__related-items">{"".join(rel_btns)}</div>'
+            f'<div class="svc-modal__related-grid">{"".join(rel_cards)}</div>'
             f'</div>'
         )
+
 
 
     # Build expandable risk profile if ratings exist
