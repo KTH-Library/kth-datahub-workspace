@@ -250,7 +250,7 @@
         apply();
         archive.scrollIntoView({ behavior: "smooth", block: "start" });
       }
-
+ }); 
 
     document.addEventListener("keydown", function (event) {
       if (event.key === "Escape" && archive.querySelector(".svc-modal:not([hidden])")) {
