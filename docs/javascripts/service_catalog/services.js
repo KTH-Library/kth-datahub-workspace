@@ -47,11 +47,13 @@
     /* Keys match both the `<select name>` and the card `data-*` attribute,
        which is what lets `matches()` stay generic. Adding a fourth filter is
        a matter of generating the select + data attribute and adding it here. */
-    var selects = {
+        var selects = {
       provider: form.querySelector('select[name="provider"]'),
       group: form.querySelector('select[name="group"]'),
-      type: form.querySelector('select[name="type"]')
+      tag: form.querySelector('select[name="tag"]')
     };
+    var activeType = "all";
+
 
     var reset = form.querySelector(".svc-filters__reset");
     var cards = Array.prototype.slice.call(archive.querySelectorAll(".svc-card"));
@@ -92,12 +94,31 @@
           if (card.dataset.search.indexOf(terms[i]) === -1) return false;
         }
       }
-      for (var key in selects) {
-        var value = selects[key].value;
-        if (value && card.dataset[key] !== value) return false;
+
+      // 1. Filtrera på aktiv typflik (Tools, Guides, Checklists, Support)
+      if (activeType !== "all" && card.dataset.type !== activeType) {
+        return false;
       }
+
+      // 2. Filtrera på provider och group
+      if (selects.provider.value && card.dataset.provider !== selects.provider.value) {
+        return false;
+      }
+      if (selects.group.value && card.dataset.group !== selects.group.value) {
+        return false;
+      }
+
+      // 3. Filtrera på tagg-dropdownen (kontrollerar tagg-sluggen i kortets data-tags)
+      if (selects.tag.value) {
+        var cardTags = (card.dataset.tags || "").split(/\s+/);
+        if (cardTags.indexOf(selects.tag.value) === -1) {
+          return false;
+        }
+      }
+
       return true;
     }
+
 
     /**
      * Apply the current filter state to the grid.
@@ -119,12 +140,12 @@
         " " + cards.length + " " + (archive.dataset.labelItems || FALLBACK_LABEL_ITEMS);
 
       noresults.hidden = visible !== 0;
-
       var dirty = !!search.value || !!selects.provider.value ||
-        !!selects.group.value || !!selects.type.value;
+        !!selects.group.value || !!selects.tag.value || activeType !== "all";
       reset.disabled = !dirty;
 
-      syncTypeTabs(selects.type.value); // <-- LÄGG TILL DENNA RAD HÄR!
+      syncTypeTabs(activeType);
+
 
       if (pushState !== false) writeUrl();
     }
@@ -136,15 +157,17 @@
      * @param {string} [openId] service id of the modal to record; omit to
      *        reuse whichever modal is currently open
      */
-    function writeUrl(openId) {
+        function writeUrl(openId) {
       var params = new URLSearchParams();
       if (search.value) params.set("q", search.value);
+      if (activeType !== "all") params.set("type", activeType);
       for (var key in selects) if (selects[key].value) params.set(key, selects[key].value);
       var open = typeof openId !== "undefined" ? openId : currentOpenId();
       if (open) params.set("service", open);
       var qs = params.toString();
       history.replaceState(null, "", qs ? "?" + qs : location.pathname);
     }
+
 
     /** @returns {string} id of the open service modal, or "" if none is open */
     function currentOpenId() {
@@ -209,28 +232,25 @@
         return;
       }
 
-      var tag = event.target.closest(".svc-tag");
+            var tag = event.target.closest(".svc-tag");
       if (tag) {
         event.preventDefault();
-        var kind = tag.dataset.tagKind;
         var value = tag.dataset.tagValue;
-        if (selects[kind]) {
-          /* Clicking the active tag again clears the filter (toggle). */
-          selects[kind].value = selects[kind].value === value ? "" : value;
+        
+        // Om taggen finns i vår tagg-dropdown, välj den (eller avmarkera om redan vald)
+        if (selects.tag) {
+          selects.tag.value = selects.tag.value === value ? "" : value;
           search.value = "";
         } else {
-          /* Tag families without a dropdown (data, location) fall back to a
-             free-text search on the label. */
           search.value = search.value === tag.textContent.trim() ? "" : tag.textContent.trim();
         }
-        /* Silent close: the reader asked for a new filtered view, so the URL
-           should describe the filter, not the card they came from. */
+
         closeModal(true);
         document.body.classList.remove("svc-modal-open");
         apply();
         archive.scrollIntoView({ behavior: "smooth", block: "start" });
       }
-    });
+
 
     document.addEventListener("keydown", function (event) {
       if (event.key === "Escape" && archive.querySelector(".svc-modal:not([hidden])")) {
@@ -242,29 +262,34 @@
     Object.keys(selects).forEach(function (key) {
       selects[key].addEventListener("change", function () { apply(); });
     });
-    reset.addEventListener("click", function () {
+        reset.addEventListener("click", function () {
       search.value = "";
+      activeType = "all";
       Object.keys(selects).forEach(function (key) { selects[key].value = ""; });
       apply();
     });
-     typeTabs.forEach(function (tab) {
+
+    typeTabs.forEach(function (tab) {
       tab.addEventListener("click", function () {
-        var t = tab.dataset.filterType;
-        selects.type.value = (t === "all") ? "" : t;
+        var t = tab.dataset.filterType || "all";
+        activeType = t;
         apply();
       });
     });
 
 
 
+
     /* ---- restore state from the URL ------------------------------------ */
 
-    var params = new URLSearchParams(location.search);
+        var params = new URLSearchParams(location.search);
     search.value = params.get("q") || "";
+    activeType = params.get("type") || "all";
     Object.keys(selects).forEach(function (key) {
       var value = params.get(key);
       if (value) selects[key].value = value;
     });
+
     apply(false); /* false: don't rewrite the URL we just read */
     if (params.get("service")) openModal(params.get("service"));
   }
