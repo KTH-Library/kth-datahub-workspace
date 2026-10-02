@@ -261,7 +261,7 @@ def _parse_service(path: str, docs_dir: str) -> dict | None:
         "icon": meta.get("icon") or "material/apps",
         "provider": meta.get("provider") or MISSING,
         "group": meta.get("group") or MISSING,
-        "type": meta.get("type") or "",
+        "type": str(meta.get("type") or "service").lower().strip(),
         "summary": meta.get("summary") or MISSING,
         "access": meta.get("access") or MISSING,
         "link": meta.get("link") or "",
@@ -352,9 +352,9 @@ def _card_html(service: dict, lang: str = "sv") -> str:
   data-rating="{color or ''}"
   data-tags="{html.escape(' '.join(t['value'] for t in service['tags']), quote=True)}"
   data-search="{html.escape(service['search'], quote=True)}">
-  <button type="button" class="svc-card__open" data-open="{service['id']}">
+    <button type="button" class="svc-card__open" data-open="{service['id']}">
     {traffic_html}
-    <span class="svc-card__icon">{_icon_html(service['icon'])}</span>
+    <span class="svc-card__icon svc-card__icon--{service['type']}">{_icon_html(service['icon'])}</span>
     <span class="svc-card__title">{html.escape(service['name'])}</span>
     <span class="svc-card__provider">{_value_html(service['provider'])}</span>
     <span class="svc-card__summary">{_value_html(service['summary'])}</span>
@@ -417,13 +417,29 @@ def _modal_html(service: dict, t: dict, lang: str = "sv") -> str:
         for s in service["sections"]
     )
 
+    # Build smart primary button based on card type
     link = ""
-    if service["link"]:
-        login = t["login"] if service["link_login"] else ""
+    target_url = service.get("link") or service.get("url") or service.get("email")
+    if target_url:
+        card_type = service.get("type", "service")
+        if service.get("button_label"):
+            btn_text = html.escape(service["button_label"])
+        elif card_type == "service":
+            login = t["login"] if service.get("link_login") else ""
+            btn_text = f"{t['to_service']}{login}"
+        elif card_type in ("guide", "checklist"):
+            btn_text = t["to_resource"]
+        elif card_type == "support":
+            btn_text = t["contact_support"]
+        else:
+            btn_text = t["to_service"]
+
+        href = f"mailto:{target_url}" if "@" in target_url and not target_url.startswith("http") else target_url
         link = (
-            f'<a class="svc-btn svc-btn--primary" href="{html.escape(service["link"], quote=True)}">'
-            f'{t["to_service"]}{login}</a>'
+            f'<a class="svc-btn svc-btn--primary" href="{html.escape(href, quote=True)}" '
+            f'target="_blank" rel="noopener noreferrer">{btn_text}</a>'
         )
+
 
     # Build expandable risk profile if ratings exist
     ratings_html = ""
@@ -499,7 +515,6 @@ def _modal_html(service: dict, t: dict, lang: str = "sv") -> str:
     {ratings_html}
     <div class="svc-modal__sections">{sections}</div>
     <div class="svc-modal__actions">
-      <a class="svc-btn" href="{service['page']}">{t['about']}</a>
       {link}
     </div>
   </div>
