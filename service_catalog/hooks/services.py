@@ -289,7 +289,7 @@ def _collect(page, config) -> list[dict]:
     if not os.path.isdir(services_dir):
         return []
 
-    services = []
+        services = []
     for name in sorted(os.listdir(services_dir)):
         if not name.endswith(".md") or name.startswith("_") or name == "index.md":
             continue
