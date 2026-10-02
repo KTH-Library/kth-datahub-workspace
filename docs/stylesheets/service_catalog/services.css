@@ -144,6 +144,64 @@
   color: var(--md-accent-fg-color);
 }
 
+/* -------------------------------------------------------------------------
+ * Card Type Colors (Symbol uppe till vänster)
+ * ------------------------------------------------------------------------- */
+
+/* Säkerställ att ikonen/SVG ärver textfärgen */
+.svc-card__icon svg,
+.svc-modal__icon svg {
+  fill: currentColor;
+}
+
+/* 1. Tjänster (Service) – KTH-blå */
+.svc-card__icon--service,
+.svc-modal__icon--service {
+  color: #1954a6;
+}
+
+/* 2. Guider (Guide) – Violett / Kunskapslila */
+.svc-card__icon--guide,
+.svc-modal__icon--guide {
+  color: #7c3aed;
+}
+
+/* 3. Checklistor (Checklist) – Bärnsten / Guld */
+.svc-card__icon--checklist,
+.svc-modal__icon--checklist {
+  color: #d97706;
+}
+
+/* 4. Stödverksamhet (Support) – Teal / Skogsgrön */
+.svc-card__icon--support,
+.svc-modal__icon--support {
+  color: #0d9488;
+}
+
+/* -------------------------------------------------------------------------
+ * Mörkt läge (Dark mode / Slate) – Ljusare nyanser för god läsbarhet
+ * ------------------------------------------------------------------------- */
+[data-md-color-scheme="slate"] .svc-card__icon--service,
+[data-md-color-scheme="slate"] .svc-modal__icon--service {
+  color: #60a5fa;
+}
+
+[data-md-color-scheme="slate"] .svc-card__icon--guide,
+[data-md-color-scheme="slate"] .svc-modal__icon--guide {
+  color: #a78bfa;
+}
+
+[data-md-color-scheme="slate"] .svc-card__icon--checklist,
+[data-md-color-scheme="slate"] .svc-modal__icon--checklist {
+  color: #fbbf24;
+}
+
+[data-md-color-scheme="slate"] .svc-card__icon--support,
+[data-md-color-scheme="slate"] .svc-modal__icon--support {
+  color: #2dd4bf;
+}
+
+
 .svc-card__title {
   display: block;
   font-weight: 700;
