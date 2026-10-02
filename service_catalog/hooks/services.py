@@ -261,7 +261,11 @@ def _parse_service(path: str, docs_dir: str) -> dict | None:
         "icon": meta.get("icon") or "material/apps",
         "provider": meta.get("provider") or MISSING,
         "group": meta.get("group") or MISSING,
-        "type": str(meta.get("type") or "service").lower().strip(),
+        "type": (
+            str(meta.get("card_type") or meta.get("type") or "service").lower().strip()
+            if str(meta.get("card_type") or meta.get("type") or "").lower().strip() in ("guide", "checklist", "support")
+            else "service"
+        ),
         "summary": meta.get("summary") or MISSING,
         "access": meta.get("access") or MISSING,
         "link": meta.get("link") or "",
@@ -628,14 +632,14 @@ def _type_tabs_html(services: list[dict], lang: str) -> str:
     labels = {
         "en": {
             "all": "All resources",
-            "service": "Services & Tools",
+            "service": "Tools",
             "guide": "Guides",
             "checklist": "Checklists",
             "support": "Support & Advice"
         },
         "sv": {
             "all": "Alla resurser",
-            "service": "Tjänster & Verktyg",
+            "service": "Verktyg",
             "guide": "Guider",
             "checklist": "Checklistor",
             "support": "Stöd & Rådgivning"
