@@ -286,19 +286,22 @@ def _collect(page, config) -> list[dict]:
     docs_dir = config["docs_dir"]
     page_dir = os.path.dirname(os.path.join(docs_dir, page.file.src_path))
     services_dir = page_dir
+
     if not os.path.isdir(services_dir):
         return []
 
-        services = []
-    for name in sorted(os.listdir(services_dir)):
-        if not name.endswith(".md") or name.startswith("_") or name == "index.md":
-            continue
-        service = _parse_service(os.path.join(services_dir, name), docs_dir)
-        if service:
-            services.append(service)
+    services = []  # <-- Viktigt att denna initieras här på samma indenteringsnivå
+
+    for root, _, files in os.walk(services_dir):
+        for name in sorted(files):
+            if not name.endswith(".md") or name.startswith("_") or name == "index.md":
+                continue
+            service = _parse_service(os.path.join(root, name), docs_dir)
+            if service:
+                services.append(service)
+
     services.sort(key=lambda s: (s["provider"].lower(), s["name"].lower()))
     return services
-
 
 def _icon_html(icon: str) -> str:
     """Inline the Material icon SVG so it renders inside raw HTML blocks."""
