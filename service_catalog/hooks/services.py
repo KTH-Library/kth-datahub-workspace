@@ -266,8 +266,8 @@ def _parse_service(path: str, docs_dir: str) -> dict | None:
         "access": meta.get("access") or MISSING,
         "link": meta.get("link") or "",
         "link_login": bool(meta.get("link_requires_login")),
-        "ratings": norm_ratings,           # <-- LÄGG TILL DETTA
-        "overall_rating": overall_rating,   # <-- LÄGG TILL DETTA
+        "ratings": norm_ratings,           
+        "overall_rating": overall_rating,   
         "page": url,
         "tags": tags,
         "sections": sections,
@@ -368,7 +368,8 @@ LABELS = {
     "sv": {
         "login": " (kräver inloggning)",
         "to_service": "Till tjänsten",
-        "about": "Om tjänsten",
+        "to_resource": "Öppna extern resurs",
+        "contact_support": "Kontakta stödet",
         "close": "Stäng",
         "empty": "Inga tjänster är inlagda ännu. Lägg en markdownfil i mappen "
                  "<code>services/</code> så visas den här.",
@@ -385,7 +386,8 @@ LABELS = {
     "en": {
         "login": " (sign-in required)",
         "to_service": "To the service",
-        "about": "About the service",
+        "to_resource": "Open external resource",
+        "contact_support": "Contact support",
         "close": "Close",
         "empty": "No services are registered yet. Add a markdown file in the "
                  "<code>services/</code> folder and it will appear here.",
