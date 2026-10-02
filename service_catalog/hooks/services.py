@@ -598,12 +598,20 @@ def _options(values) -> str:
 def _archive_html(services: list[dict], t: dict, lang: str = "sv") -> str:
     if not services:
         return f'<p class="svc-empty">{t["empty"]}</p>'
+
+    # 1. Bygg dropdown-options för leverantörer och funktionsgrupper
     providers = _options(s["provider"] for s in services)
     groups = _options(s["group"] for s in services)
-    types = _options(s["type"] for s in services)
+
+    # 2. Samla alla unika taggar och bygg options för tagg-dropdownen
+    all_tag_labels = {tag["label"] for s in services for tag in s.get("tags", []) if tag.get("label")}
+    tags_options = _options(all_tag_labels)
+
     cards = "".join(_card_html(s, lang) for s in services)
     modals = "".join(_modal_html(s, t, lang) for s in services)
     type_tabs = _type_tabs_html(services, lang)
+
+    tag_label = "Alla taggar / ämnen" if lang == "sv" else "All topics / tags"
 
     return f"""<div class="svc-archive" data-count="{len(services)}"
   data-label-of="{t['of']}" data-label-items="{t['items']}">
@@ -612,7 +620,7 @@ def _archive_html(services: list[dict], t: dict, lang: str = "sv") -> str:
     <input type="search" class="svc-filters__search" name="q" placeholder="{t['search']}" aria-label="{t['search_label']}">
     <select name="provider" aria-label="{t['provider']}"><option value="">{t['provider']}</option>{providers}</select>
     <select name="group" aria-label="{t['group']}"><option value="">{t['group']}</option>{groups}</select>
-    <select name="type" aria-label="{t['type']}"><option value="">{t['type']}</option>{types}</select>
+    <select name="tag" aria-label="{tag_label}"><option value="">{tag_label}</option>{tags_options}</select>
     <button type="button" class="svc-filters__reset" disabled>{t['reset']}</button>
   </form>
   <p class="svc-count" aria-live="polite"></p>
@@ -620,6 +628,7 @@ def _archive_html(services: list[dict], t: dict, lang: str = "sv") -> str:
   <p class="svc-noresults" hidden>{t['noresults']}</p>
   <div class="svc-modals">{modals}</div>
 </div>"""
+
 
 
 def _type_tabs_html(services: list[dict], lang: str) -> str:
