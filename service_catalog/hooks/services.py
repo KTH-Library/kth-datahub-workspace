@@ -254,7 +254,7 @@ def _parse_service(path: str, docs_dir: str) -> dict | None:
     raw_ratings = meta.get("rating") or meta.get("ratings") or {}
     norm_ratings = normalize_ratings(raw_ratings)
     overall_rating = calculate_overall_rating(norm_ratings)
-        button_text = str(meta.get("button_text") or meta.get("action_text") or "").strip()
+    button_text = str(meta.get("button_text") or meta.get("action_text") or "").strip()
 
     service = {
         "id": _slug(os.path.splitext(os.path.basename(path))[0]),
