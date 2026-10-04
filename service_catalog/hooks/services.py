@@ -821,7 +821,7 @@ def _generate_rss_xml(services: list[dict], site_url: str, lang: str) -> str:
         item_link = f"{catalog_url}?service={item_id}"
         
         # Markera eventuell cross-language fallback i titeln
-        item_title = s.get("name", item_id)
+        item_title = str(s.get("name") or item_id)
         if s.get("is_fallback"):
             item_title += " [In English]" if s.get("original_lang") == "en" else " [På svenska]"
 
@@ -835,17 +835,24 @@ def _generate_rss_xml(services: list[dict], site_url: str, lang: str) -> str:
             guid_suffix = "latest"
 
         guid = f"{base_url}/{lang}/services/{item_id}#{guid_suffix}"
-        item_desc = s.get("summary") or s.get("description") or ""
+        item_desc = str(s.get("summary") or s.get("description") or "")
 
-        # Kategorier: provider, typ samt eventuella taggar
-        categories = []
-        if s.get("provider"):
-            categories.append(s["provider"])
-        if s.get("type"):
-            categories.append(s["type"])
-        for tag in s.get("tags") or []:
-            if tag not in categories:
-                categories.append(tag)
+        # Kategorier: provider, typ samt eventuella tagg-labels (aldrig dict-objekt eller 'Missing data')
+        categories: list[str] = []
+        
+        prov = s.get("provider")
+        if prov and prov != MISSING and prov not in categories:
+            categories.append(str(prov))
+            
+        stype = s.get("type")
+        if stype and stype != MISSING and stype not in categories:
+            categories.append(str(stype))
+
+        for t in s.get("tags") or []:
+            # t är en dict {"label": ..., "kind": ..., "value": ...}
+            t_label = t.get("label") if isinstance(t, dict) else str(t)
+            if t_label and t_label != MISSING and t_label not in categories:
+                categories.append(str(t_label))
 
         cat_elements = "\n".join(
             f"      <category>{xml_escape(cat)}</category>" for cat in categories
@@ -875,6 +882,7 @@ def _generate_rss_xml(services: list[dict], site_url: str, lang: str) -> str:
   </channel>
 </rss>
 """
+
 
 def on_post_build(config, **kwargs):
     """Skriver RSS 2.0 XML-filer till site_dir efter att sajten byggts."""
