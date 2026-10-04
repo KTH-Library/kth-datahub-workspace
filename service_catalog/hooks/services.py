@@ -790,57 +790,92 @@ def on_page_markdown(markdown, page, config, files, **kwargs):
     return markdown.replace(MARKER, _archive_html(services, LABELS[lang], lang))
 
 def _generate_rss_xml(services: list[dict], site_url: str, lang: str) -> str:
-    """Genererar ett RSS 2.0-flöde för tjänsterna och resurserna."""
-    base_url = site_url.rstrip("/") if site_url else ""
-    
-    feed_title = "KTH Digital Services & Research Resources" if lang == "en" else "KTH Digitala tjänster & forskningsresurser"
-    feed_desc = (
-        "Updates and new additions to the research service catalog and guides at KTH."
-        if lang == "en"
-        else "Uppdateringar och nya tillägg bland forskningsnära tjänster och guider vid KTH."
+    """Generates an RSS 2.0 feed for digital services and resources."""
+    base_url = site_url.rstrip("/")
+    feed_url = f"{base_url}/services-{lang}.xml"
+    catalog_url = f"{base_url}/{lang}/services/"
+
+    title = (
+        "KTH Digitala tjänster & forskningsresurser"
+        if lang == "sv"
+        else "KTH Digital Services & Research Resources"
     )
-    feed_link = f"{base_url}/{lang}/services/" if base_url else f"/{lang}/services/"
+    description = (
+        "Uppdateringar och nya tillägg bland forskningsnära tjänster och guider vid KTH."
+        if lang == "sv"
+        else "Updates and additions across research services and guides at KTH."
+    )
 
-    # Sortera senaste först
-    sorted_services = sorted(services, key=lambda s: s.get("date") or datetime.min.replace(tzinfo=timezone.utc), reverse=True)
+    now_rfc822 = format_datetime(datetime.now(timezone.utc))
 
-    items = []
+    # Sortera så nyast uppdaterade kommer överst
+    sorted_services = sorted(
+        services,
+        key=lambda s: s.get("date") or datetime.min.replace(tzinfo=timezone.utc),
+        reverse=True,
+    )
+
+    items_xml = []
     for s in sorted_services:
-        item_title = s["name"]
+        item_id = s.get("id", "")
+        item_link = f"{catalog_url}?service={item_id}"
+        
+        # Markera eventuell cross-language fallback i titeln
+        item_title = s.get("name", item_id)
         if s.get("is_fallback"):
             item_title += " [In English]" if s.get("original_lang") == "en" else " [På svenska]"
-            
-        item_desc = s.get("summary") or ""
-        item_date = format_datetime(s["date"]) if s.get("date") else ""
-        item_link = f"{base_url}{s['page']}" if base_url else s["page"]
-        
-        # Kategoritaggar
-        categories = "".join(f"<category>{xml_escape(t['label'])}</category>" for t in s.get("tags", []))
 
-        items.append(f"""    <item>
+        # Formatera pubDate till RFC-822
+        pub_dt = s.get("date")
+        if isinstance(pub_dt, datetime):
+            pub_date_str = format_datetime(pub_dt)
+            guid_suffix = pub_dt.strftime("%Y-%m-%d")
+        else:
+            pub_date_str = now_rfc822
+            guid_suffix = "latest"
+
+        guid = f"{base_url}/{lang}/services/{item_id}#{guid_suffix}"
+        item_desc = s.get("summary") or s.get("description") or ""
+
+        # Kategorier: provider, typ samt eventuella taggar
+        categories = []
+        if s.get("provider"):
+            categories.append(s["provider"])
+        if s.get("type"):
+            categories.append(s["type"])
+        for tag in s.get("tags") or []:
+            if tag not in categories:
+                categories.append(tag)
+
+        cat_elements = "\n".join(
+            f"      <category>{xml_escape(cat)}</category>" for cat in categories
+        )
+
+        items_xml.append(f"""    <item>
       <title>{xml_escape(item_title)}</title>
       <link>{xml_escape(item_link)}</link>
-      <guid isPermaLink="false">{xml_escape(s['id'] + '-' + str(s.get('date', '')))}</guid>
-      <pubDate>{item_date}</pubDate>
+      <guid isPermaLink="false">{xml_escape(guid)}</guid>
+      <pubDate>{pub_date_str}</pubDate>
       <description>{xml_escape(item_desc)}</description>
-      {categories}
+{cat_elements}
     </item>""")
 
-    now_rfc = format_datetime(datetime.now(timezone.utc))
+    joined_items = "\n".join(items_xml)
 
     return f"""<?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>{xml_escape(feed_title)}</title>
-    <link>{xml_escape(feed_link)}</link>
-    <description>{xml_escape(feed_desc)}</description>
+    <title>{xml_escape(title)}</title>
+    <link>{xml_escape(catalog_url)}</link>
+    <description>{xml_escape(description)}</description>
     <language>{lang}</language>
-    <lastBuildDate>{now_rfc}</lastBuildDate>
-    <atom:link href="{base_url}/services-{lang}.xml" rel="self" type="application/rss+xml" />
-{"".join(items)}
+    <lastBuildDate>{now_rfc822}</lastBuildDate>
+    <atom:link href="{xml_escape(feed_url)}" rel="self" type="application/rss+xml" />
+{joined_items}
   </channel>
 </rss>
 """
+
 def on_post_build(config, **kwargs):
     """Skriver RSS 2.0 XML-filer till site_dir efter att sajten byggts."""
     site_dir = config["site_dir"]
