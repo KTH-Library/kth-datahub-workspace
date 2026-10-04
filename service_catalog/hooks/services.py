@@ -718,6 +718,18 @@ def _archive_html(services: list[dict], t: dict, lang: str = "sv") -> str:
     type_tabs = _type_tabs_html(services, lang)
 
     tag_label = "Alla taggar / ämnen" if lang == "sv" else "All topics / tags"
+    rss_title = "RSS-flöde för tjänster och guider" if lang == "sv" else "RSS feed for services and guides"
+    feed_filename = f"services-{lang}.xml"
+
+    # SVG för klassisk ren RSS-ikon
+    rss_svg = (
+        '<svg class="svc-rss-icon" viewBox="0 0 24 24" width="16" height="16" '
+        'fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">'
+        '<path d="M4 11a9 9 0 0 1 9 9"></path>'
+        '<path d="M4 4a16 16 0 0 1 16 16"></path>'
+        '<circle cx="5" cy="19" r="1.5" fill="currentColor"></circle>'
+        '</svg>'
+    )
 
     return f"""<div class="svc-archive" data-count="{len(services)}"
   data-label-of="{t['of']}" data-label-items="{t['items']}">
@@ -728,12 +740,17 @@ def _archive_html(services: list[dict], t: dict, lang: str = "sv") -> str:
     <select name="group" aria-label="{t['group']}"><option value="">{t['group']}</option>{groups}</select>
     <select name="tag" aria-label="{tag_label}"><option value="">{tag_label}</option>{tags_options}</select>
     <button type="button" class="svc-filters__reset" disabled>{t['reset']}</button>
+    <a href="../../{feed_filename}" class="svc-filters__rss" title="{rss_title}" aria-label="{rss_title}" target="_blank">
+      {rss_svg}
+      <span class="svc-filters__rss-label">RSS</span>
+    </a>
   </form>
   <p class="svc-count" aria-live="polite"></p>
   <div class="svc-grid">{cards}</div>
   <p class="svc-noresults" hidden>{t['noresults']}</p>
   <div class="svc-modals">{modals}</div>
 </div>"""
+
 
 
 
