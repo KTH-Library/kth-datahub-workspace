@@ -630,7 +630,6 @@ def _modal_html(service: dict, t: dict, lang: str = "sv") -> str:
     <button type="button" class="svc-modal__close" data-close="{service['id']}" aria-label="{t['close']}">&times;</button>
     <p class="svc-modal__icon">{_icon_html(service['icon'])}</p>
     <h2 class="svc-modal__title" id="svc-modal-title-{service['id']}">{html.escape(service['name'])}</h2>
-        <h2 class="svc-modal__title" id="svc-modal-title-{service['id']}">{html.escape(service['name'])}</h2>
     {fallback_notice}
     <p class="svc-modal__provider">{_value_html(service['provider'])}</p>
     <p class="svc-modal__summary">{_value_html(service['summary'])}</p>
