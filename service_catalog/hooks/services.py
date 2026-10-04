@@ -252,10 +252,11 @@ def _parse_service(path: str, docs_dir: str) -> dict | None:
         for label in _as_list(meta.get(key)):
             tags.append({"label": label, "kind": kind, "value": _slug(label)})
 
-    sections = []
+        sections = []
     for title, section_md in _split_sections(body):
-    sections.append({"title": title, "html": _md().convert(section_md)})
-        raw_ratings = meta.get("rating") or meta.get("ratings") or {}
+        sections.append({"title": title, "html": _md().convert(section_md)})
+
+    raw_ratings = meta.get("rating") or meta.get("ratings") or {}
     norm_ratings = normalize_ratings(raw_ratings)
     overall_rating = calculate_overall_rating(norm_ratings)
 
