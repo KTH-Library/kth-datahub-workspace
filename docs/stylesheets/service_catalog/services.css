@@ -801,3 +801,35 @@ body.svc-modal-open { overflow: hidden; }
   font-size: 0.85rem;
   color: var(--md-default-fg-color, #e2e8f0);
 }
+
+/* --- RSS-knapp i filterfältet -------------------------------------------- */
+
+.svc-filters__rss {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.4rem 0.65rem;
+  border: 1px solid var(--md-default-fg-color--lighter, #d1d5db);
+  border-radius: 0.25rem;
+  background: var(--md-default-bg-color, #fff);
+  color: var(--md-default-fg-color--light, #6b7280);
+  text-decoration: none !important;
+  font-size: 0.75rem;
+  font-weight: 600;
+  line-height: 1;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+
+.svc-filters__rss:hover {
+  border-color: #ee802f;
+  background: #fff8f2;
+  color: #ee802f;
+  box-shadow: 0 1px 3px rgba(238, 128, 47, 0.15);
+}
+
+.svc-filters__rss .svc-rss-icon {
+  flex-shrink: 0;
+  display: block;
+}
+
