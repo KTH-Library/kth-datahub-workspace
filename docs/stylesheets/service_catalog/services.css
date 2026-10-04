@@ -774,3 +774,30 @@ body.svc-modal-open { overflow: hidden; }
 
 [data-md-color-scheme="slate"] .svc-mini-card--support .svc-mini-card__icon,
 [data-md-color-scheme="slate"] .svc-mini-card--support .svc-mini-card__type { color: #2dd4bf; }
+
+/* Språk-badge för fallback-kort */
+.svc-badge-lang {
+  display: inline-block;
+  font-size: 0.72rem;
+  font-weight: 600;
+  line-height: 1;
+  padding: 3px 6px;
+  border-radius: 4px;
+  background-color: var(--md-default-bg-color--lightest, rgba(255, 255, 255, 0.1));
+  border: 1px solid var(--md-default-fg-color--lightest, rgba(255, 255, 255, 0.2));
+  color: var(--md-default-fg-color, #e2e8f0);
+  vertical-align: middle;
+  margin-left: 6px;
+  white-space: nowrap;
+}
+
+/* Modal informationsbanner */
+.svc-modal__lang-notice {
+  background: rgba(59, 130, 246, 0.12);
+  border-left: 4px solid #3b82f6;
+  padding: 8px 12px;
+  margin: 12px 0 16px 0;
+  border-radius: 0 4px 4px 0;
+  font-size: 0.85rem;
+  color: var(--md-default-fg-color, #e2e8f0);
+}
