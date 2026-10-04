@@ -701,13 +701,23 @@ def _options(values) -> str:
     )
 
 
-def _archive_html(services: list[dict], t: dict, lang: str = "sv", page_url: str = "") -> str:
+def _archive_html(services: list[dict], t: dict, lang: str = "sv", page=None) -> str:
     if not services:
         return f'<p class="svc-empty">{t["empty"]}</p>'
 
-    # Räkna ut exakt antal nivåer upp till roten från aktuell sida
-    depth = len([p for p in page_url.strip("/").split("/") if p])
-    rel_root = ("../" * depth) if depth > 0 else "./"
+    # Räkna ut relativ sökväg till roten från sidans faktiska destinationsmapp:
+    # Engelska (dest: services/index.html) -> 1 nivå upp ("../")
+    # Svenska  (dest: sv/services/index.html) -> 2 nivåer upp ("../../")
+    depth = 0
+    if page and hasattr(page, "file") and getattr(page.file, "dest_uri", None):
+        dest_dir = os.path.dirname(page.file.dest_uri.replace(os.sep, "/"))
+        depth = len([p for p in dest_dir.split("/") if p])
+    
+    # Fallback om dest_uri saknas
+    if depth == 0:
+        depth = 2 if lang == "sv" else 1
+
+    rel_root = "../" * depth
     feed_url = f"{rel_root}services-{lang}.xml"
 
     # 1. Bygg dropdown-options för leverantörer och funktionsgrupper
@@ -754,6 +764,7 @@ def _archive_html(services: list[dict], t: dict, lang: str = "sv", page_url: str
   <p class="svc-noresults" hidden>{t['noresults']}</p>
   <div class="svc-modals">{modals}</div>
 </div>"""
+
 
 
 
