@@ -19,6 +19,10 @@ import re
 import markdown as md_lib
 import yaml
 
+from datetime import datetime, timezone
+from email.utils import format_datetime
+from xml.sax.saxutils import escape as xml_escape
+
 log = logging.getLogger("mkdocs.hooks.services")
 
 MARKER = "<!-- SERVICES_ARCHIVE -->"
@@ -278,8 +282,30 @@ def _parse_service(path: str, docs_dir: str) -> dict | None:
         "tags": tags,
         "sections": sections,
         "related": _as_list(meta.get("related")),
+        "date": parsed_date,
         "source": rel,
     }
+    
+    # Extrahera uppdateringsdatum (frontmatter 'last_updated', 'updated', 'date' eller filens mtime)
+    raw_date = meta.get("last_updated") or meta.get("updated") or meta.get("date")
+    parsed_date = None
+    if raw_date:
+        try:
+            # Stöd både YYYY-MM-DD och datetime-objekt från PyYAML
+            if isinstance(raw_date, datetime):
+                parsed_date = raw_date if raw_date.tzinfo else raw_date.replace(tzinfo=timezone.utc)
+            elif hasattr(raw_date, "isoformat"):  # t.ex. datetime.date
+                parsed_date = datetime.combine(raw_date, datetime.min.time(), tzinfo=timezone.utc)
+            else:
+                dt = datetime.strptime(str(raw_date).strip()[:10], "%Y-%m-%d")
+                parsed_date = dt.replace(tzinfo=timezone.utc)
+        except Exception:
+            parsed_date = None
+
+    if not parsed_date:
+        # Fallback till filens ändringsdatum
+        mtime = os.path.getmtime(path)
+        parsed_date = datetime.fromtimestamp(mtime, tz=timezone.utc)
 
     service["search"] = " ".join(
         [service["name"], service["provider"], service["group"], service["type"],
@@ -743,5 +769,90 @@ def on_page_markdown(markdown, page, config, files, **kwargs):
     services = _collect(page, config)
     return markdown.replace(MARKER, _archive_html(services, LABELS[lang], lang))
 
+def _generate_rss_xml(services: list[dict], site_url: str, lang: str) -> str:
+    """Genererar ett RSS 2.0-flöde för tjänsterna och resurserna."""
+    base_url = site_url.rstrip("/") if site_url else ""
+    
+    feed_title = "KTH Digital Services & Research Resources" if lang == "en" else "KTH Digitala tjänster & forskningsresurser"
+    feed_desc = (
+        "Updates and new additions to the research service catalog and guides at KTH."
+        if lang == "en"
+        else "Uppdateringar och nya tillägg bland forskningsnära tjänster och guider vid KTH."
+    )
+    feed_link = f"{base_url}/{lang}/services/" if base_url else f"/{lang}/services/"
+
+    # Sortera senaste först
+    sorted_services = sorted(services, key=lambda s: s.get("date") or datetime.min.replace(tzinfo=timezone.utc), reverse=True)
+
+    items = []
+    for s in sorted_services:
+        item_title = s["name"]
+        if s.get("is_fallback"):
+            item_title += " [In English]" if s.get("original_lang") == "en" else " [På svenska]"
+            
+        item_desc = s.get("summary") or ""
+        item_date = format_datetime(s["date"]) if s.get("date") else ""
+        item_link = f"{base_url}{s['page']}" if base_url else s["page"]
+        
+        # Kategoritaggar
+        categories = "".join(f"<category>{xml_escape(t['label'])}</category>" for t in s.get("tags", []))
+
+        items.append(f"""    <item>
+      <title>{xml_escape(item_title)}</title>
+      <link>{xml_escape(item_link)}</link>
+      <guid isPermaLink="false">{xml_escape(s['id'] + '-' + str(s.get('date', '')))}</guid>
+      <pubDate>{item_date}</pubDate>
+      <description>{xml_escape(item_desc)}</description>
+      {categories}
+    </item>""")
+
+    now_rfc = format_datetime(datetime.now(timezone.utc))
+
+    return f"""<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>{xml_escape(feed_title)}</title>
+    <link>{xml_escape(feed_link)}</link>
+    <description>{xml_escape(feed_desc)}</description>
+    <language>{lang}</language>
+    <lastBuildDate>{now_rfc}</lastBuildDate>
+    <atom:link href="{base_url}/services-{lang}.xml" rel="self" type="application/rss+xml" />
+{"".join(items)}
+  </channel>
+</rss>
+"""
+def on_post_build(config, **kwargs):
+    """Skriver RSS 2.0 XML-filer till site_dir efter att sajten byggts."""
+    site_dir = config["site_dir"]
+    docs_dir = config["docs_dir"]
+    site_url = config.get("site_url") or ""
+
+    for lang in ("sv", "en"):
+        # Hitta katalogen för språket
+        lang_services_dir = os.path.join(docs_dir, lang, "services")
+        other_lang = "en" if lang == "sv" else "sv"
+        other_services_dir = os.path.join(docs_dir, other_lang, "services")
+
+        current_services = _scan_dir(lang_services_dir, docs_dir)
+        other_services = _scan_dir(other_services_dir, docs_dir)
+
+        services_dict = dict(current_services)
+        for svc_id, svc in other_services.items():
+            if svc_id not in services_dict:
+                fb = dict(svc)
+                fb["is_fallback"] = True
+                fb["original_lang"] = other_lang
+                services_dict[svc_id] = fb
+
+        services = list(services_dict.values())
+        rss_content = _generate_rss_xml(services, site_url, lang)
+
+        out_path = os.path.join(site_dir, f"services-{lang}.xml")
+        try:
+            with open(out_path, "w", encoding="utf-8") as f:
+                f.write(rss_content)
+            log.info("services: wrote RSS feed to %s", out_path)
+        except Exception as e:
+            log.error("services: failed to write RSS feed %s: %s", out_path, e)
 
 
