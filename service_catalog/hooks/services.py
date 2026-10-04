@@ -254,7 +254,8 @@ def _parse_service(path: str, docs_dir: str) -> dict | None:
     raw_ratings = meta.get("rating") or meta.get("ratings") or {}
     norm_ratings = normalize_ratings(raw_ratings)
     overall_rating = calculate_overall_rating(norm_ratings)
-    
+        button_text = str(meta.get("button_text") or meta.get("action_text") or "").strip()
+
     service = {
         "id": _slug(os.path.splitext(os.path.basename(path))[0]),
         "name": meta.get("name") or MISSING,
@@ -268,7 +269,8 @@ def _parse_service(path: str, docs_dir: str) -> dict | None:
         ),
         "summary": meta.get("summary") or MISSING,
         "access": meta.get("access") or MISSING,
-        "link": meta.get("link") or "",
+        "link": meta.get("link") or meta.get("url") or "",
+        "button_text": str(meta.get("button_text") or meta.get("button_label") or "").strip(),
         "link_login": bool(meta.get("link_requires_login")),
         "ratings": norm_ratings,           
         "overall_rating": overall_rating,   
@@ -405,7 +407,8 @@ def _card_html(service: dict, lang: str = "sv") -> str:
 LABELS = {
     "sv": {
         "login": " (kräver inloggning)",
-        "to_service": "Till tjänsten",
+        "to_service": "Öppna tjänsten",
+        "more_info": "Mer information",
         "to_resource": "Öppna extern resurs",
         "contact_support": "Kontakta stödet",
         "close": "Stäng",
@@ -423,7 +426,8 @@ LABELS = {
     },
     "en": {
         "login": " (sign-in required)",
-        "to_service": "To the service",
+        "to_service": "Open service",
+        "more_info": "More information",
         "to_resource": "Open external resource",
         "contact_support": "Contact support",
         "close": "Close",
@@ -457,26 +461,29 @@ def _modal_html(service: dict, t: dict, lang: str = "sv") -> str:
 
     # Build smart primary button based on card type
     link = ""
-    target_url = service.get("link") or service.get("url") or service.get("email")
+    target_url = service.get("link") or service.get("url")
     if target_url:
         card_type = service.get("type", "service")
-        if service.get("button_label"):
-            btn_text = html.escape(service["button_label"])
+        
+        # 1. Bestäm knapptext: antingen specifik button_text eller default per typ
+        if service.get("button_text"):
+            btn_text = html.escape(service["button_text"])
         elif card_type == "service":
             login = t["login"] if service.get("link_login") else ""
             btn_text = f"{t['to_service']}{login}"
-        elif card_type in ("guide", "checklist"):
-            btn_text = t["to_resource"]
-        elif card_type == "support":
-            btn_text = t["contact_support"]
         else:
-            btn_text = t["to_service"]
+            btn_text = t["more_info"]
 
-        href = f"mailto:{target_url}" if "@" in target_url and not target_url.startswith("http") else target_url
+        # 2. Avgör extern vs intern länk (för pil och target="_blank")
+        is_external = target_url.startswith("http://") or target_url.startswith("https://")
+        target_attr = ' target="_blank" rel="noopener noreferrer"' if is_external else ""
+        arrow = "&nbsp;&nearr;" if is_external else "&nbsp;&rarr;"
+
         link = (
-            f'<a class="svc-btn svc-btn--primary" href="{html.escape(href, quote=True)}" '
-            f'target="_blank" rel="noopener noreferrer">{btn_text}</a>'
+            f'<a class="svc-btn svc-btn--primary" href="{html.escape(target_url, quote=True)}"'
+            f'{target_attr}>{btn_text}{arrow}</a>'
         )
+
 
     related_html = ""
     if service.get("related_items"):
