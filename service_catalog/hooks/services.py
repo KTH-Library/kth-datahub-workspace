@@ -254,11 +254,29 @@ def _parse_service(path: str, docs_dir: str) -> dict | None:
 
     sections = []
     for title, section_md in _split_sections(body):
-        sections.append({"title": title, "html": _md().convert(section_md)})
-    raw_ratings = meta.get("rating") or meta.get("ratings") or {}
+    sections.append({"title": title, "html": _md().convert(section_md)})
+        raw_ratings = meta.get("rating") or meta.get("ratings") or {}
     norm_ratings = normalize_ratings(raw_ratings)
     overall_rating = calculate_overall_rating(norm_ratings)
-    button_text = str(meta.get("button_text") or meta.get("action_text") or "").strip()
+
+    # Extrahera uppdateringsdatum FÖRE vi bygger service-dicten
+    raw_date = meta.get("last_updated") or meta.get("updated") or meta.get("date")
+    parsed_date = None
+    if raw_date:
+        try:
+            if isinstance(raw_date, datetime):
+                parsed_date = raw_date if raw_date.tzinfo else raw_date.replace(tzinfo=timezone.utc)
+            elif hasattr(raw_date, "isoformat"):
+                parsed_date = datetime.combine(raw_date, datetime.min.time(), tzinfo=timezone.utc)
+            else:
+                dt = datetime.strptime(str(raw_date).strip()[:10], "%Y-%m-%d")
+                parsed_date = dt.replace(tzinfo=timezone.utc)
+        except Exception:
+            parsed_date = None
+
+    if not parsed_date:
+        mtime = os.path.getmtime(path)
+        parsed_date = datetime.fromtimestamp(mtime, tz=timezone.utc)
 
     service = {
         "id": _slug(os.path.splitext(os.path.basename(path))[0]),
@@ -285,6 +303,7 @@ def _parse_service(path: str, docs_dir: str) -> dict | None:
         "date": parsed_date,
         "source": rel,
     }
+
     
     # Extrahera uppdateringsdatum (frontmatter 'last_updated', 'updated', 'date' eller filens mtime)
     raw_date = meta.get("last_updated") or meta.get("updated") or meta.get("date")
