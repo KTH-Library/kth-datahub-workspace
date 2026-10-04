@@ -701,9 +701,14 @@ def _options(values) -> str:
     )
 
 
-def _archive_html(services: list[dict], t: dict, lang: str = "sv") -> str:
+def _archive_html(services: list[dict], t: dict, lang: str = "sv", page_url: str = "") -> str:
     if not services:
         return f'<p class="svc-empty">{t["empty"]}</p>'
+
+    # Räkna ut exakt antal nivåer upp till roten från aktuell sida
+    depth = len([p for p in page_url.strip("/").split("/") if p])
+    rel_root = ("../" * depth) if depth > 0 else "./"
+    feed_url = f"{rel_root}services-{lang}.xml"
 
     # 1. Bygg dropdown-options för leverantörer och funktionsgrupper
     providers = _options(s["provider"] for s in services)
@@ -719,7 +724,6 @@ def _archive_html(services: list[dict], t: dict, lang: str = "sv") -> str:
 
     tag_label = "Alla taggar / ämnen" if lang == "sv" else "All topics / tags"
     rss_title = "RSS-flöde för tjänster och guider" if lang == "sv" else "RSS feed for services and guides"
-    feed_filename = f"services-{lang}.xml"
 
     # SVG för klassisk ren RSS-ikon
     rss_svg = (
@@ -740,7 +744,7 @@ def _archive_html(services: list[dict], t: dict, lang: str = "sv") -> str:
     <select name="group" aria-label="{t['group']}"><option value="">{t['group']}</option>{groups}</select>
     <select name="tag" aria-label="{tag_label}"><option value="">{tag_label}</option>{tags_options}</select>
     <button type="button" class="svc-filters__reset" disabled>{t['reset']}</button>
-    <a href="../../{feed_filename}" class="svc-filters__rss" title="{rss_title}" aria-label="{rss_title}" target="_blank">
+    <a href="{feed_url}" class="svc-filters__rss" title="{rss_title}" aria-label="{rss_title}" target="_blank">
       {rss_svg}
       <span class="svc-filters__rss-label">RSS</span>
     </a>
@@ -750,7 +754,6 @@ def _archive_html(services: list[dict], t: dict, lang: str = "sv") -> str:
   <p class="svc-noresults" hidden>{t['noresults']}</p>
   <div class="svc-modals">{modals}</div>
 </div>"""
-
 
 
 
