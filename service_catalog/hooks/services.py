@@ -289,30 +289,53 @@ def _parse_service(path: str, docs_dir: str) -> dict | None:
     return service
 
 
-def _collect(page, config) -> list[dict]:
-    docs_dir = config["docs_dir"]
-    page_dir = os.path.dirname(os.path.join(docs_dir, page.file.src_path))
-    services_dir = page_dir
-
-    if not os.path.isdir(services_dir):
-        return []
-
-    services = []  # <-- Viktigt att denna initieras här på samma indenteringsnivå
-
-    for root, _, files in os.walk(services_dir):
+def _scan_dir(target_dir: str, docs_dir: str) -> dict[str, dict]:
+    """Skannar en specifik underkatalog och returnerar en dict med {id: service}."""
+    res = {}
+    if not os.path.isdir(target_dir):
+        return res
+    for root, _, files in os.walk(target_dir):
         for name in sorted(files):
             if not name.endswith(".md") or name.startswith("_") or name == "index.md":
                 continue
-            service = _parse_service(os.path.join(root, name), docs_dir)
-            if service:
-                services.append(service)
+            svc = _parse_service(os.path.join(root, name), docs_dir)
+            if svc:
+                res[svc["id"]] = svc
+    return res
 
+
+def _collect(page, config) -> list[dict]:
+    docs_dir = config["docs_dir"]
+    page_dir = os.path.dirname(os.path.join(docs_dir, page.file.src_path))
+    
+    # Identifiera nuvarande språk ("sv" eller "en")
+    is_sv = "/sv/" in page.file.src_path or page.file.src_path.startswith("sv/")
+    current_lang = "sv" if is_sv else "en"
+    other_lang = "en" if is_sv else "sv"
+
+    # Hitta katalogerna för båda språken
+    current_dir = page_dir
+    other_dir = page_dir.replace(f"/{current_lang}/", f"/{other_lang}/")
+
+    current_services = _scan_dir(current_dir, docs_dir)
+    other_services = _scan_dir(other_dir, docs_dir)
+
+    # Bygg den sammanslagna listan: primära språket först
+    services_dict = dict(current_services)
+
+    # Lägg till saknade resurser från det andra språket som fallback
+    for svc_id, svc in other_services.items():
+        if svc_id not in services_dict:
+            fallback_svc = dict(svc)
+            fallback_svc["is_fallback"] = True
+            fallback_svc["original_lang"] = other_lang
+            services_dict[svc_id] = fallback_svc
+
+    services = list(services_dict.values())
     services.sort(key=lambda s: (s["provider"].lower(), s["name"].lower()))
     _link_relations(services)
     return services
 
-    
-    return services
 
 def _link_relations(services: list[dict]) -> None:
     """Resolve bidirectional relations between cards."""
@@ -380,9 +403,16 @@ def _card_html(service: dict, lang: str = "sv") -> str:
         labels = RATING_LABELS.get(lang, RATING_LABELS["sv"])
         desc = labels.get(color, color)
         traffic_html = (
-    f'<span class="svc-traffic-badge svc-traffic-badge--{color}" '
-    f'title="{labels["traffic_light"]}: {desc}"></span>'
-)
+            f'<span class="svc-traffic-badge svc-traffic-badge--{color}" '
+            f'title="{labels["traffic_light"]}: {desc}"></span>'
+        )
+
+    # Språk-badge om resursen visas som fallback från det andra språket
+    badge_lang = ""
+    if service.get("is_fallback"):
+        orig = service.get("original_lang")
+        badge_text = "In English" if orig == "en" else "På svenska"
+        badge_lang = f' <span class="svc-badge-lang">{badge_text}</span>'
 
     return f"""<article class="svc-card" id="svc-card-{service['id']}"
   data-id="{service['id']}"
@@ -392,15 +422,16 @@ def _card_html(service: dict, lang: str = "sv") -> str:
   data-rating="{color or ''}"
   data-tags="{html.escape(' '.join(t['value'] for t in service['tags']), quote=True)}"
   data-search="{html.escape(service['search'], quote=True)}">
-    <button type="button" class="svc-card__open" data-open="{service['id']}">
+  <button type="button" class="svc-card__open" data-open="{service['id']}">
     {traffic_html}
     <span class="svc-card__icon svc-card__icon--{service['type']}">{_icon_html(service['icon'])}</span>
-    <span class="svc-card__title">{html.escape(service['name'])}</span>
+    <span class="svc-card__title">{html.escape(service['name'])}{badge_lang}</span>
     <span class="svc-card__provider">{_value_html(service['provider'])}</span>
     <span class="svc-card__summary">{_value_html(service['summary'])}</span>
   </button>
   <div class="svc-card__tags">{tags}</div>
 </article>"""
+
 
 
 
@@ -458,6 +489,17 @@ def _modal_html(service: dict, t: dict, lang: str = "sv") -> str:
         f'</details>'
         for s in service["sections"]
     )
+
+    fallback_notice = ""
+    if service.get("is_fallback"):
+        orig = service.get("original_lang")
+        notice_text = (
+            "Denna resurs finns för närvarande endast tillgänglig på engelska."
+            if orig == "en"
+            else "This resource is currently only available in Swedish."
+        )
+        fallback_notice = f'<div class="svc-modal__lang-notice">{notice_text}</div>'
+
 
     # Build smart primary button based on card type
     link = ""
@@ -570,6 +612,16 @@ def _modal_html(service: dict, t: dict, lang: str = "sv") -> str:
         )
 
 
+    # Informationsbanner i modalen om resursen är på det andra språket
+    fallback_notice = ""
+    if service.get("is_fallback"):
+        orig = service.get("original_lang")
+        notice_text = (
+            "Denna resurs finns för närvarande endast tillgänglig på engelska."
+            if orig == "en"
+            else "This resource is currently only available in Swedish."
+        )
+        fallback_notice = f'<div class="svc-modal__lang-notice">{notice_text}</div>'
 
     return f"""<div class="svc-modal" id="svc-modal-{service['id']}" role="dialog" aria-modal="true"
   aria-labelledby="svc-modal-title-{service['id']}" hidden>
@@ -578,6 +630,8 @@ def _modal_html(service: dict, t: dict, lang: str = "sv") -> str:
     <button type="button" class="svc-modal__close" data-close="{service['id']}" aria-label="{t['close']}">&times;</button>
     <p class="svc-modal__icon">{_icon_html(service['icon'])}</p>
     <h2 class="svc-modal__title" id="svc-modal-title-{service['id']}">{html.escape(service['name'])}</h2>
+        <h2 class="svc-modal__title" id="svc-modal-title-{service['id']}">{html.escape(service['name'])}</h2>
+    {fallback_notice}
     <p class="svc-modal__provider">{_value_html(service['provider'])}</p>
     <p class="svc-modal__summary">{_value_html(service['summary'])}</p>
     <div class="svc-modal__tags">{tags}</div>
