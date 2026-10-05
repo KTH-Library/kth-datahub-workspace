@@ -233,16 +233,28 @@ uv run mkdocs build --clean --strict -v
 ## Field & Feature Reference
 Feature	Details
 Date (last_updated)	YYYY-MM-DD. Dictates card publication in the language RSS feeds (/services-en.xml and /services-sv.xml). Update this date when significant content changes are published. (Fallback: file modification timestamp).
+
 Tables	Standard Markdown pipe syntax | col | col | inside any ## section. Rendered with neat borders and zebra striping inside the modal accordions.
+
 Images	Standard Markdown ![alt text](../../path/to/image.png). Images are constrained to max-width: 100% so they never overflow the modal container.
+
 Card Types (type)	service (tools/services), guide, checklist, or support. Controls the card's color-coded icon, top filter tabs, and default action button text.
+
 Buttons (link & button_text)	Target destination URL. Default label is "Open service / Öppna tjänsten" for services, and "More information / Mer information" for guides, checklists, and support. Override at any time with button_text: "Custom label".
+
 Headings (##)	Text before the first ## is the front card summary. Every subsequent ## Heading becomes an expandable accordion inside the details modal.
-Traffic Lights (rating)	Dimensions: legal, ip, security, cost, support. Allowed statuses: green, yellow, red. The overall badge displays the worst rating among critical categories (legal, ip, security). Missing critical ratings show as incomplete (grey).
+
+Traffic Lights (rating)	Dimensions: legal, ip, security, cost, support. Allowed statuses: green, yellow, red. The overall badge displays the worst rating among critical categories (legal, ip, security). 
+Missing critical ratings show as incomplete (grey).
+
 Assessment Notes (note)	Optional explanations per rating dimension. Clicking the traffic light in the modal expands these notes for full transparency.
+
 Bi-directional Relations (related)	List of other card IDs (e.g. related: [kth-onedrive, gitlab]). Defining it on one card automatically establishes mutual mini-card links in both modals.
+
 Tags (tags)	Keyword list. Displayed as badges on the card face, searchable via free text, and automatically aggregated in the tag filter dropdown.
+
 Cross-language Fallback	If a card only exists in one language, it is still displayed in both language catalogues with an [In English] or [På svenska] badge and an informational notice inside the modal.--
+
 ## Other ways to contribute
 
 If you spot a typo, error, or want to add more information, feel free to contribute, we welcome all contributions to the KTH Data Hub Workspace.
