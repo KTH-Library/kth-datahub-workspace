@@ -279,13 +279,7 @@ kostnad, data- och kodkrav, indikatorer och förväntad handläggningstid.
 
 ## Mer stöd och verktyg
 
-Den här guiden sammanfattar de viktigaste stegen. För en mer omfattande
-verktygslåda med databaser, tidskriftsmatchning, indikatorer, open
-access-resurser och material om publiceringsetik, se:
-
-- [Choosing a Journal: support page and tool box](https://awandahl.github.io/choosing_journal/)
-
-Du kan även kontakta KTH Library för stöd med publiceringsstrategi, open access,
+Den här guiden sammanfattar de viktigaste stegen. Du kan alltid kontakta KTH Library för stöd med publiceringsstrategi, open access,
 forskningsdata och bibliometriska frågor.
 
 
