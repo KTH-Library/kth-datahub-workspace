@@ -280,12 +280,6 @@ software requirements, indicators and expected publication timeline.
 
 ## Further support and tools
 
-This guide summarises the most important steps. For a more extensive toolbox with
-databases, journal matching services, indicators, open access resources and
-material on publication ethics, see:
-
-- [Choosing a Journal: support page and tool box](https://awandahl.github.io/choosing_journal/)
-
-You can also contact KTH Library for support with publishing strategy, open
+This guide summarises the most important steps. You can also contact KTH Library for support with publishing strategy, open
 access, research data and bibliometric questions.
 
