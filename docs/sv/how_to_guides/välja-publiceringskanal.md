@@ -111,8 +111,6 @@ källor för att kontrollera tidskriftsindexering. I vissa ämnen är dock
 disciplinära databaser viktigare, till exempel Inspec, Compendex, MEDLINE,
 Chemical Abstracts, MathSciNet, zbMATH, ERIC eller GeoRef.
 
-[MIAR](https://miar.ub.edu/) kan användas för en bred översikt över tidskrifter
-och deras täckning i olika databaser.
 
 !!! note "Kontrollera uppgiften i källan"
     En tidskrifts webbplats kan ange att den är indexerad i en viss databas.
@@ -172,7 +170,7 @@ kostnader som kan täckas genom KTH:s avtal:
 - [Publicera open access – vi betalar](https://www.kth.se/en/biblioteket/publicera-analysera/vagledning-for-publicering/publicera-open-access-vi-betalar-1.859196)
 - [KTH policy for publishing](https://www.kth.se/en/biblioteket/publicera-analysera/vagledning-for-publicering/kth-s-policy-for-publicering-1.854744)
 - [cOAlition S Journal Checker Tool](https://journalcheckertool.org/)
-- [Sherpa Romeo](https://v2.sherpa.ac.uk/romeo/) för information om
+- [Jisc Open Policy Finder](https://openpolicyfinder.jisc.ac.uk/) för information om
   parallellpublicering och rättigheter.
 
 !!! note "Kontrollera kostnader före inskick"
