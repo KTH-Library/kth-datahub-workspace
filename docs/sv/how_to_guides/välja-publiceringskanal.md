@@ -279,7 +279,7 @@ kostnad, data- och kodkrav, indikatorer och förväntad handläggningstid.
 
 ## Mer stöd och verktyg
 
-Den här guiden sammanfattar de viktigaste stegen. Du kan alltid kontakta KTH Library för stöd med publiceringsstrategi, open access,
+Den här guiden sammanfattar de viktigaste stegen. Du kan alltid kontakta KTH Biblioteket för stöd med publiceringsstrategi, open access,
 forskningsdata och bibliometriska frågor.
 
 
