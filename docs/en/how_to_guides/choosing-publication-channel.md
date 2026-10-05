@@ -280,6 +280,6 @@ software requirements, indicators and expected publication timeline.
 
 ## Further support and tools
 
-This guide summarises the most important steps. You can also contact KTH Library for support with publishing strategy, open
+This guide summarises the most important steps. You can always contact KTH Library for support with publishing strategy, open
 access, research data and bibliometric questions.
 
