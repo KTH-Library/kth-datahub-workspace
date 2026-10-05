@@ -170,7 +170,7 @@ that may be covered through KTH agreements:
 - [Publish Open Access – we cover your costs](https://www.kth.se/en/biblioteket/publicera-analysera/vagledning-for-publicering/publicera-open-access-vi-betalar-1.859196)
 - [KTH policy for publishing](https://www.kth.se/en/biblioteket/publicera-analysera/vagledning-for-publicering/kth-s-policy-for-publicering-1.854744)
 - [cOAlition S Journal Checker Tool](https://journalcheckertool.org/)
-- [Sherpa Romeo](https://v2.sherpa.ac.uk/romeo/) for information about
+- [Jisc Open Policy Finder](https://openpolicyfinder.jisc.ac.uk/) for information about
   self-archiving and rights.
 
 !!! note "Check costs before submission"
