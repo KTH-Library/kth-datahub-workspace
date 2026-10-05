@@ -114,9 +114,6 @@ sources for checking journal indexing. In some fields, however, disciplinary
 databases are more important, for example Inspec, Compendex, MEDLINE, Chemical
 Abstracts, MathSciNet, zbMATH, ERIC or GeoRef.
 
-[MIAR](https://miar.ub.edu/) can be used for a broad overview of journals and
-their coverage in different databases.
-
 !!! note "Verify information in the source database"
     A journal's website may state that it is indexed in a particular database.
     If needed, verify this information in the database's own source list. Be
