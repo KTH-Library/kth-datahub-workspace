@@ -5,7 +5,7 @@ description = "KTH Data Hub Workspace"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
-    "mkdocs<2.0.0",
+    "mkdocs>=1.6,<2.0.0",
     "mkdocs-glightbox>=0.5.2",
     "mkdocs-material>=9.6.22",
     "mkdocs-static-i18n>=1.2.3",

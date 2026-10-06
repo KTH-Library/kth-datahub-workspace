@@ -228,7 +228,7 @@ dependencies = [
 
 [package.metadata]
 requires-dist = [
-    { name = "mkdocs", specifier = "<2.0.0" },
+    { name = "mkdocs", specifier = ">=1.6,<2.0.0" },
     { name = "mkdocs-glightbox", specifier = ">=0.5.2" },
     { name = "mkdocs-material", specifier = ">=9.6.22" },
     { name = "mkdocs-static-i18n", specifier = ">=1.2.3" },
