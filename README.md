@@ -72,31 +72,8 @@ avoid it being copied to the published `site/` tree.
 
 ### Overview
 
-If you want to add a new document named `reproducible-numerical-analysis.md`,
-
-- create `docs/en/<choose-suitable-directory-here>/reproducible-numerical-analysis.md`.
-- ideally also create a Swedish-language version in `docs/sv/<choose-suitable-directory-here>/reproducible-numerical-analysis.md`.
-- update `mkdocs.yml`:
-  Ensure that your filename is included in the `nav` section of the `mkdocs.yml`
-  configuration for both `en` and `sv`, for example:
-
-```yaml
-nav:
-  - Home: index.md
-  # add the new document here
-  - Reproducible numerical analysis: reproducible-numerical-analysis.md
-# ...
-# and for the Swedish version:
-plugins:
-  - i18n:
-    - locale: sv
-      name: Svenska
-      build: true
-      nav:
-        - Hem: index.md
-        # add the new document here
-        - Reproducerbar numerisk analys: reproducible-numerical-analysis.md
-```
+If you want to add an article or guide to this Workspace you will find
+[instructions on our Contributions page](https://kth-library.github.io/kth-datahub-workspace/how_to_guides/contribute/#how-to-add-an-article-or-guide-to-the-workspace).
 
 
 ### Local development

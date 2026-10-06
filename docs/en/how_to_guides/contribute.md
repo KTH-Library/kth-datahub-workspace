@@ -16,3 +16,29 @@ on this workspace.
 
 We plan to offer more ways to submit your contributions in the near future - if you
 have any suggestions on how we should receive contributions, please let us know.
+
+
+### How to add an article or guide to the Workspace
+
+1. Create your Markdown file in a suitable folder under `docs/en/`
+   (we will assume you are writing an English-language text, but the same applies
+   for your Swedish translation).
+   For example, let's say you have created `docs/en/methodologies/optogenetics.md`.
+2. Add your document's path and title to the English-language `nav` variable in `mkdocs.yml`.
+3. Add a hyperlink to your document in `docs/en/index.md`.
+
+For your Swedish-language version of your article/guide, do the same but simply
+replace `docs/en` with `docs/sv`.
+
+> NOTE! The filename of the document in both languages needs to be the same!
+> (As far as I can tell this is a MkDocs limitation).
+
+Optionally, [render the updated Workspace site in your local browser](https://github.com/KTH-Library/kth-datahub-workspace/tree/master#local-development).
+
+When you are happy with your changes and want to share them with us and the world,
+commit your changes in your local repository, and then push your commit to your
+own remote fork.
+On GitHub, create a pull request from your branch to ours.
+
+N.B. this Workspace uses the [MkDocs site generator](https://www.mkdocs.org/user-guide/writing-your-docs)
+under the hood.
