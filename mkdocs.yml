@@ -127,7 +127,7 @@ plugins:
                 - Bidra till denna arbetsyta: how_to_guides/contribute.md
                 - Digital Europe Multilingual Services: how_to_guides/eu-multilingual-services.md
                 - Komma åt Jupyter vid EOSC EU-noden: how_to_guides/EOSC_Jupyter.md
-                - Publicera din artikel: how_to_guides/välja-publiceringskanal.md
+                - Publicera din artikel: how_to_guides/choosing-publication-channel.md
             - Kunskapsbas:
                 - KTH-stöd: knowledge_base/kth-support.md
                 - Communities: knowledge_base/communities.md

@@ -24,6 +24,7 @@
     - [Recording and transcribing interviews](how_to_guides/record-transcribe-interviews.md)
     - [Bidra till denna arbetsyta](how_to_guides/contribute.md)
     - [Digital Europe Multilingual Services](how_to_guides/eu-multilingual-services.md)
+    - [Publicera min forskning](how_to_guides/choosing-publication-channel.md)
     - [komma åt resurser inom EOSC](how_to_guides/EOSC_Jupyter.md)
 
 - ## Kunskapsbas

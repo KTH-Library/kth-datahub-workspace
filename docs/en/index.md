@@ -29,6 +29,7 @@ The TOC appear to rest on shaky foundations...
     - [Recording and transcribing interviews](how_to_guides/record-transcribe-interviews.md)
     - [Contributing to this workspace!](how_to_guides/contribute.md)
     - [Digital Europe Multilingual Services](how_to_guides/eu-multilingual-services.md)
+    - [Choosing a venue for your publication](how_to_guides/choosing-publication-channel.md)
     - [Access Jupyter notebooks at EOSC EU node](how_to_guides/EOSC_Jupyter.md)
 
 - ## Knowledge base
