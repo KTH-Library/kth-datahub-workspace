@@ -12,6 +12,83 @@
    below to keep text contrast readable.
    ========================================================================== */
 
+/* --- Type tabs ----------------------------------------------------------- */
+
+.svc-type-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .5rem;
+  margin: 1.2rem 0 .4rem;
+}
+
+.svc-type-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: .45rem;
+  padding: .35rem .75rem;
+  border-radius: 2rem;
+  border: 1px solid var(--md-default-fg-color--lighter);
+  background: var(--md-default-bg-color);
+  color: var(--md-default-fg-color--light);
+  font-size: .8rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all .15s ease;
+  user-select: none;
+}
+
+.svc-type-tab:hover {
+  border-color: var(--md-default-fg-color--light);
+  color: var(--md-default-fg-color);
+}
+
+.svc-type-tab:focus-visible {
+  outline: 2px solid var(--md-accent-fg-color);
+  outline-offset: 2px;
+}
+
+/* Siffra/räknare inuti fliken */
+.svc-type-tab__count {
+  display: inline-block;
+  padding: .1rem .4rem;
+  border-radius: 1rem;
+  background: var(--md-default-fg-color--lightest, rgba(0, 0, 0, .06));
+  font-size: .7rem;
+  font-weight: 600;
+  line-height: 1;
+}
+
+/* Aktiv flik: färgkodad efter typ */
+.svc-type-tab.is-active {
+  background: var(--md-accent-fg-color);
+  border-color: var(--md-accent-fg-color);
+  color: var(--md-accent-bg-color, #fff);
+}
+
+.svc-type-tab.is-active .svc-type-tab__count {
+  background: rgba(255, 255, 255, .25);
+  color: inherit;
+}
+
+/* Typ-specifika accentfärger vid aktiv flik */
+.svc-type-tab--service.is-active   { background: #1954a6; border-color: #1954a6; color: #fff; }
+.svc-type-tab--guide.is-active     { background: #7c3aed; border-color: #7c3aed; color: #fff; }
+.svc-type-tab--checklist.is-active { background: #d97706; border-color: #d97706; color: #fff; }
+.svc-type-tab--support.is-active   { background: #0d9488; border-color: #0d9488; color: #fff; }
+
+/* Slate / mörkt läge */
+[data-md-color-scheme="slate"] .svc-type-tab__count {
+  background: rgba(255, 255, 255, .08);
+}
+[data-md-color-scheme="slate"] .svc-type-tab--service.is-active   { background: #60a5fa; border-color: #60a5fa; color: #0f172a; }
+[data-md-color-scheme="slate"] .svc-type-tab--guide.is-active     { background: #a78bfa; border-color: #a78bfa; color: #0f172a; }
+[data-md-color-scheme="slate"] .svc-type-tab--checklist.is-active { background: #fbbf24; border-color: #fbbf24; color: #0f172a; }
+[data-md-color-scheme="slate"] .svc-type-tab--support.is-active   { background: #2dd4bf; border-color: #2dd4bf; color: #0f172a; }
+[data-md-color-scheme="slate"] .svc-type-tab.is-active .svc-type-tab__count {
+  background: rgba(0, 0, 0, .2);
+}
+
+
 /* --- Filter bar ---------------------------------------------------------- */
 
 .svc-filters {
@@ -143,6 +220,64 @@
   display: block;
   color: var(--md-accent-fg-color);
 }
+
+/* -------------------------------------------------------------------------
+ * Card Type Colors (Symbol uppe till vänster)
+ * ------------------------------------------------------------------------- */
+
+/* Säkerställ att ikonen/SVG ärver textfärgen */
+.svc-card__icon svg,
+.svc-modal__icon svg {
+  fill: currentColor;
+}
+
+/* 1. Tjänster (Service) – KTH-blå */
+.svc-card__icon--service,
+.svc-modal__icon--service {
+  color: #1954a6;
+}
+
+/* 2. Guider (Guide) – Violett / Kunskapslila */
+.svc-card__icon--guide,
+.svc-modal__icon--guide {
+  color: #7c3aed;
+}
+
+/* 3. Checklistor (Checklist) – Bärnsten / Guld */
+.svc-card__icon--checklist,
+.svc-modal__icon--checklist {
+  color: #d97706;
+}
+
+/* 4. Stödverksamhet (Support) – Teal / Skogsgrön */
+.svc-card__icon--support,
+.svc-modal__icon--support {
+  color: #0d9488;
+}
+
+/* -------------------------------------------------------------------------
+ * Mörkt läge (Dark mode / Slate) – Ljusare nyanser för god läsbarhet
+ * ------------------------------------------------------------------------- */
+[data-md-color-scheme="slate"] .svc-card__icon--service,
+[data-md-color-scheme="slate"] .svc-modal__icon--service {
+  color: #60a5fa;
+}
+
+[data-md-color-scheme="slate"] .svc-card__icon--guide,
+[data-md-color-scheme="slate"] .svc-modal__icon--guide {
+  color: #a78bfa;
+}
+
+[data-md-color-scheme="slate"] .svc-card__icon--checklist,
+[data-md-color-scheme="slate"] .svc-modal__icon--checklist {
+  color: #fbbf24;
+}
+
+[data-md-color-scheme="slate"] .svc-card__icon--support,
+[data-md-color-scheme="slate"] .svc-modal__icon--support {
+  color: #2dd4bf;
+}
+
 
 .svc-card__title {
   display: block;
@@ -512,3 +647,189 @@
 
 /* Prevents the page behind an open modal from scrolling. */
 body.svc-modal-open { overflow: hidden; }
+
+/* --- Relaterade resurser / Miniatyrkort i modalen --- */
+
+.svc-modal__related {
+  margin-top: 1.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--md-default-fg-color--lightest);
+}
+
+.svc-modal__related h4 {
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--md-default-fg-color--light);
+  margin: 0 0 0.8rem;
+}
+
+.svc-modal__related-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+  gap: 0.75rem;
+}
+
+.svc-mini-card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
+  padding: 0.75rem 0.9rem;
+  border-radius: 0.4rem;
+  border: 1px solid var(--md-default-fg-color--lighter);
+  background: var(--md-default-bg-color);
+  cursor: pointer;
+  transition: transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+  width: 100%;
+}
+
+.svc-mini-card:hover {
+  transform: translateY(-2px);
+  border-color: var(--md-accent-fg-color);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+}
+
+.svc-mini-card__header {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  gap: 0.45rem;
+  margin-bottom: 0.4rem;
+}
+
+.svc-mini-card__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.2rem;
+  height: 1.2rem;
+}
+
+.svc-mini-card__icon svg {
+  width: 1.1rem;
+  height: 1.1rem;
+  fill: currentColor;
+}
+
+.svc-mini-card__type {
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.svc-mini-card__arrow {
+  margin-left: auto;
+  font-size: 0.85rem;
+  opacity: 0.4;
+  transition: transform 0.15s ease, opacity 0.15s ease;
+}
+
+.svc-mini-card:hover .svc-mini-card__arrow {
+  opacity: 1;
+  transform: translateX(3px);
+}
+
+.svc-mini-card__title {
+  font-size: 0.82rem;
+  font-weight: 600;
+  line-height: 1.35;
+  color: var(--md-default-fg-color);
+}
+
+/* Färgkodning per korttyp */
+.svc-mini-card--service .svc-mini-card__icon,
+.svc-mini-card--service .svc-mini-card__type { color: #1954a6; }
+
+.svc-mini-card--guide .svc-mini-card__icon,
+.svc-mini-card--guide .svc-mini-card__type { color: #7c3aed; }
+
+.svc-mini-card--checklist .svc-mini-card__icon,
+.svc-mini-card--checklist .svc-mini-card__type { color: #d97706; }
+
+.svc-mini-card--support .svc-mini-card__icon,
+.svc-mini-card--support .svc-mini-card__type { color: #0d9488; }
+
+/* Slate / Dark Mode */
+[data-md-color-scheme="slate"] .svc-mini-card {
+  background: rgba(255, 255, 255, 0.03);
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
+[data-md-color-scheme="slate"] .svc-mini-card:hover {
+  background: rgba(255, 255, 255, 0.07);
+  border-color: rgba(255, 255, 255, 0.35);
+}
+
+[data-md-color-scheme="slate"] .svc-mini-card--service .svc-mini-card__icon,
+[data-md-color-scheme="slate"] .svc-mini-card--service .svc-mini-card__type { color: #60a5fa; }
+
+[data-md-color-scheme="slate"] .svc-mini-card--guide .svc-mini-card__icon,
+[data-md-color-scheme="slate"] .svc-mini-card--guide .svc-mini-card__type { color: #a78bfa; }
+
+[data-md-color-scheme="slate"] .svc-mini-card--checklist .svc-mini-card__icon,
+[data-md-color-scheme="slate"] .svc-mini-card--checklist .svc-mini-card__type { color: #fbbf24; }
+
+[data-md-color-scheme="slate"] .svc-mini-card--support .svc-mini-card__icon,
+[data-md-color-scheme="slate"] .svc-mini-card--support .svc-mini-card__type { color: #2dd4bf; }
+
+/* Språk-badge för fallback-kort */
+.svc-badge-lang {
+  display: inline-block;
+  font-size: 0.72rem;
+  font-weight: 600;
+  line-height: 1;
+  padding: 3px 6px;
+  border-radius: 4px;
+  background-color: var(--md-default-bg-color--lightest, rgba(255, 255, 255, 0.1));
+  border: 1px solid var(--md-default-fg-color--lightest, rgba(255, 255, 255, 0.2));
+  color: var(--md-default-fg-color, #e2e8f0);
+  vertical-align: middle;
+  margin-left: 6px;
+  white-space: nowrap;
+}
+
+/* Modal informationsbanner */
+.svc-modal__lang-notice {
+  background: rgba(59, 130, 246, 0.12);
+  border-left: 4px solid #3b82f6;
+  padding: 8px 12px;
+  margin: 12px 0 16px 0;
+  border-radius: 0 4px 4px 0;
+  font-size: 0.85rem;
+  color: var(--md-default-fg-color, #e2e8f0);
+}
+
+/* --- RSS-knapp i filterfältet -------------------------------------------- */
+
+.svc-filters__rss {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.4rem 0.65rem;
+  border: 1px solid var(--md-default-fg-color--lighter, #d1d5db);
+  border-radius: 0.25rem;
+  background: var(--md-default-bg-color, #fff);
+  color: var(--md-default-fg-color--light, #6b7280);
+  text-decoration: none !important;
+  font-size: 0.75rem;
+  font-weight: 600;
+  line-height: 1;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+
+.svc-filters__rss:hover {
+  border-color: #ee802f;
+  background: #fff8f2;
+  color: #ee802f;
+  box-shadow: 0 1px 3px rgba(238, 128, 47, 0.15);
+}
+
+.svc-filters__rss .svc-rss-icon {
+  flex-shrink: 0;
+  display: block;
+}
+

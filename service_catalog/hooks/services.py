@@ -19,6 +19,10 @@ import re
 import markdown as md_lib
 import yaml
 
+from datetime import datetime, timezone
+from email.utils import format_datetime
+from xml.sax.saxutils import escape as xml_escape
+
 log = logging.getLogger("mkdocs.hooks.services")
 
 MARKER = "<!-- SERVICES_ARCHIVE -->"
@@ -248,31 +252,80 @@ def _parse_service(path: str, docs_dir: str) -> dict | None:
         for label in _as_list(meta.get(key)):
             tags.append({"label": label, "kind": kind, "value": _slug(label)})
 
-    sections = []
+        sections = []
     for title, section_md in _split_sections(body):
         sections.append({"title": title, "html": _md().convert(section_md)})
+
     raw_ratings = meta.get("rating") or meta.get("ratings") or {}
     norm_ratings = normalize_ratings(raw_ratings)
     overall_rating = calculate_overall_rating(norm_ratings)
-    
+
+    # Extrahera uppdateringsdatum FÖRE vi bygger service-dicten
+    raw_date = meta.get("last_updated") or meta.get("updated") or meta.get("date")
+    parsed_date = None
+    if raw_date:
+        try:
+            if isinstance(raw_date, datetime):
+                parsed_date = raw_date if raw_date.tzinfo else raw_date.replace(tzinfo=timezone.utc)
+            elif hasattr(raw_date, "isoformat"):
+                parsed_date = datetime.combine(raw_date, datetime.min.time(), tzinfo=timezone.utc)
+            else:
+                dt = datetime.strptime(str(raw_date).strip()[:10], "%Y-%m-%d")
+                parsed_date = dt.replace(tzinfo=timezone.utc)
+        except Exception:
+            parsed_date = None
+
+    if not parsed_date:
+        mtime = os.path.getmtime(path)
+        parsed_date = datetime.fromtimestamp(mtime, tz=timezone.utc)
+
     service = {
         "id": _slug(os.path.splitext(os.path.basename(path))[0]),
         "name": meta.get("name") or MISSING,
         "icon": meta.get("icon") or "material/apps",
         "provider": meta.get("provider") or MISSING,
         "group": meta.get("group") or MISSING,
-        "type": meta.get("type") or "",
+        "type": (
+            str(meta.get("card_type") or meta.get("type") or "service").lower().strip()
+            if str(meta.get("card_type") or meta.get("type") or "").lower().strip() in ("guide", "checklist", "support")
+            else "service"
+        ),
         "summary": meta.get("summary") or MISSING,
         "access": meta.get("access") or MISSING,
-        "link": meta.get("link") or "",
+        "link": meta.get("link") or meta.get("url") or "",
+        "button_text": str(meta.get("button_text") or meta.get("button_label") or "").strip(),
         "link_login": bool(meta.get("link_requires_login")),
-        "ratings": norm_ratings,           # <-- LÄGG TILL DETTA
-        "overall_rating": overall_rating,   # <-- LÄGG TILL DETTA
+        "ratings": norm_ratings,           
+        "overall_rating": overall_rating,   
         "page": url,
         "tags": tags,
         "sections": sections,
+        "related": _as_list(meta.get("related")),
+        "date": parsed_date,
         "source": rel,
     }
+
+    
+    # Extrahera uppdateringsdatum (frontmatter 'last_updated', 'updated', 'date' eller filens mtime)
+    raw_date = meta.get("last_updated") or meta.get("updated") or meta.get("date")
+    parsed_date = None
+    if raw_date:
+        try:
+            # Stöd både YYYY-MM-DD och datetime-objekt från PyYAML
+            if isinstance(raw_date, datetime):
+                parsed_date = raw_date if raw_date.tzinfo else raw_date.replace(tzinfo=timezone.utc)
+            elif hasattr(raw_date, "isoformat"):  # t.ex. datetime.date
+                parsed_date = datetime.combine(raw_date, datetime.min.time(), tzinfo=timezone.utc)
+            else:
+                dt = datetime.strptime(str(raw_date).strip()[:10], "%Y-%m-%d")
+                parsed_date = dt.replace(tzinfo=timezone.utc)
+        except Exception:
+            parsed_date = None
+
+    if not parsed_date:
+        # Fallback till filens ändringsdatum
+        mtime = os.path.getmtime(path)
+        parsed_date = datetime.fromtimestamp(mtime, tz=timezone.utc)
 
     service["search"] = " ".join(
         [service["name"], service["provider"], service["group"], service["type"],
@@ -282,22 +335,78 @@ def _parse_service(path: str, docs_dir: str) -> dict | None:
     return service
 
 
+def _scan_dir(target_dir: str, docs_dir: str) -> dict[str, dict]:
+    """Skannar en specifik underkatalog och returnerar en dict med {id: service}."""
+    res = {}
+    if not os.path.isdir(target_dir):
+        return res
+    for root, _, files in os.walk(target_dir):
+        for name in sorted(files):
+            if not name.endswith(".md") or name.startswith("_") or name == "index.md":
+                continue
+            svc = _parse_service(os.path.join(root, name), docs_dir)
+            if svc:
+                res[svc["id"]] = svc
+    return res
+
+
 def _collect(page, config) -> list[dict]:
     docs_dir = config["docs_dir"]
     page_dir = os.path.dirname(os.path.join(docs_dir, page.file.src_path))
-    services_dir = page_dir
-    if not os.path.isdir(services_dir):
-        return []
+    
+    # Identifiera nuvarande språk ("sv" eller "en")
+    is_sv = "/sv/" in page.file.src_path or page.file.src_path.startswith("sv/")
+    current_lang = "sv" if is_sv else "en"
+    other_lang = "en" if is_sv else "sv"
 
-    services = []
-    for name in sorted(os.listdir(services_dir)):
-        if not name.endswith(".md") or name.startswith("_") or name == "index.md":
-            continue
-        service = _parse_service(os.path.join(services_dir, name), docs_dir)
-        if service:
-            services.append(service)
+    # Hitta katalogerna för båda språken
+    current_dir = page_dir
+    other_dir = page_dir.replace(f"/{current_lang}/", f"/{other_lang}/")
+
+    current_services = _scan_dir(current_dir, docs_dir)
+    other_services = _scan_dir(other_dir, docs_dir)
+
+    # Bygg den sammanslagna listan: primära språket först
+    services_dict = dict(current_services)
+
+    # Lägg till saknade resurser från det andra språket som fallback
+    for svc_id, svc in other_services.items():
+        if svc_id not in services_dict:
+            fallback_svc = dict(svc)
+            fallback_svc["is_fallback"] = True
+            fallback_svc["original_lang"] = other_lang
+            services_dict[svc_id] = fallback_svc
+
+    services = list(services_dict.values())
     services.sort(key=lambda s: (s["provider"].lower(), s["name"].lower()))
+    _link_relations(services)
     return services
+
+
+def _link_relations(services: list[dict]) -> None:
+    """Resolve bidirectional relations between cards."""
+    by_id = {s["id"]: s for s in services}
+
+    # 1. Korskoppla: Om A länkar till B, se till att B också länkar till A
+    for s in services:
+        for target_id in list(s.get("related", [])):
+            if target_id in by_id:
+                target = by_id[target_id]
+                if s["id"] not in target["related"]:
+                    target["related"].append(s["id"])
+
+    # 2. Skapa färdiga objekt så modalen enkelt kan rita ut knapparna
+    for s in services:
+        s["related_items"] = [
+            {
+                "id": rid,
+                "name": by_id[rid]["name"],
+                "type": by_id[rid].get("type", "service"),
+                "icon": by_id[rid]["icon"],
+            }
+            for rid in s.get("related", [])
+            if rid in by_id and rid != s["id"]
+        ]
 
 
 def _icon_html(icon: str) -> str:
@@ -340,9 +449,16 @@ def _card_html(service: dict, lang: str = "sv") -> str:
         labels = RATING_LABELS.get(lang, RATING_LABELS["sv"])
         desc = labels.get(color, color)
         traffic_html = (
-    f'<span class="svc-traffic-badge svc-traffic-badge--{color}" '
-    f'title="{labels["traffic_light"]}: {desc}"></span>'
-)
+            f'<span class="svc-traffic-badge svc-traffic-badge--{color}" '
+            f'title="{labels["traffic_light"]}: {desc}"></span>'
+        )
+
+    # Språk-badge om resursen visas som fallback från det andra språket
+    badge_lang = ""
+    if service.get("is_fallback"):
+        orig = service.get("original_lang")
+        badge_text = "In English" if orig == "en" else "På svenska"
+        badge_lang = f' <span class="svc-badge-lang">{badge_text}</span>'
 
     return f"""<article class="svc-card" id="svc-card-{service['id']}"
   data-id="{service['id']}"
@@ -354,8 +470,8 @@ def _card_html(service: dict, lang: str = "sv") -> str:
   data-search="{html.escape(service['search'], quote=True)}">
   <button type="button" class="svc-card__open" data-open="{service['id']}">
     {traffic_html}
-    <span class="svc-card__icon">{_icon_html(service['icon'])}</span>
-    <span class="svc-card__title">{html.escape(service['name'])}</span>
+    <span class="svc-card__icon svc-card__icon--{service['type']}">{_icon_html(service['icon'])}</span>
+    <span class="svc-card__title">{html.escape(service['name'])}{badge_lang}</span>
     <span class="svc-card__provider">{_value_html(service['provider'])}</span>
     <span class="svc-card__summary">{_value_html(service['summary'])}</span>
   </button>
@@ -364,11 +480,14 @@ def _card_html(service: dict, lang: str = "sv") -> str:
 
 
 
+
 LABELS = {
     "sv": {
         "login": " (kräver inloggning)",
-        "to_service": "Till tjänsten",
-        "about": "Om tjänsten",
+        "to_service": "Öppna tjänsten",
+        "more_info": "Mer information",
+        "to_resource": "Öppna extern resurs",
+        "contact_support": "Kontakta stödet",
         "close": "Stäng",
         "empty": "Inga tjänster är inlagda ännu. Lägg en markdownfil i mappen "
                  "<code>services/</code> så visas den här.",
@@ -384,8 +503,10 @@ LABELS = {
     },
     "en": {
         "login": " (sign-in required)",
-        "to_service": "To the service",
-        "about": "About the service",
+        "to_service": "Open service",
+        "more_info": "More information",
+        "to_resource": "Open external resource",
+        "contact_support": "Contact support",
         "close": "Close",
         "empty": "No services are registered yet. Add a markdown file in the "
                  "<code>services/</code> folder and it will appear here.",
@@ -415,13 +536,67 @@ def _modal_html(service: dict, t: dict, lang: str = "sv") -> str:
         for s in service["sections"]
     )
 
-    link = ""
-    if service["link"]:
-        login = t["login"] if service["link_login"] else ""
-        link = (
-            f'<a class="svc-btn svc-btn--primary" href="{html.escape(service["link"], quote=True)}">'
-            f'{t["to_service"]}{login}</a>'
+    fallback_notice = ""
+    if service.get("is_fallback"):
+        orig = service.get("original_lang")
+        notice_text = (
+            "Denna resurs finns för närvarande endast tillgänglig på engelska."
+            if orig == "en"
+            else "This resource is currently only available in Swedish."
         )
+        fallback_notice = f'<div class="svc-modal__lang-notice">{notice_text}</div>'
+
+
+    # Build smart primary button based on card type
+    link = ""
+    target_url = service.get("link") or service.get("url")
+    if target_url:
+        card_type = service.get("type", "service")
+        
+        # 1. Bestäm knapptext: antingen specifik button_text eller default per typ
+        if service.get("button_text"):
+            btn_text = html.escape(service["button_text"])
+        elif card_type == "service":
+            login = t["login"] if service.get("link_login") else ""
+            btn_text = f"{t['to_service']}{login}"
+        else:
+            btn_text = t["more_info"]
+
+        # 2. Avgör extern vs intern länk (för pil och target="_blank")
+        is_external = target_url.startswith("http://") or target_url.startswith("https://")
+        target_attr = ' target="_blank" rel="noopener noreferrer"' if is_external else ""
+        arrow = "&nbsp;&nearr;" if is_external else "&nbsp;&rarr;"
+
+        link = (
+            f'<a class="svc-btn svc-btn--primary" href="{html.escape(target_url, quote=True)}"'
+            f'{target_attr}>{btn_text}{arrow}</a>'
+        )
+
+
+    related_html = ""
+    if service.get("related_items"):
+        rel_label = "Relaterat innehåll" if lang == "sv" else "Related resources"
+        rel_cards = []
+        for rel in service["related_items"]:
+            card_type = rel.get("type", "service")
+            rel_cards.append(
+                f'<button type="button" class="svc-mini-card svc-mini-card--{card_type}" data-open="{rel["id"]}">'
+                f'<div class="svc-mini-card__header">'
+                f'<span class="svc-mini-card__icon">{_icon_html(rel["icon"])}</span>'
+                f'<span class="svc-mini-card__type">{html.escape(card_type.capitalize())}</span>'
+                f'<span class="svc-mini-card__arrow">&rarr;</span>'
+                f'</div>'
+                f'<div class="svc-mini-card__title">{html.escape(rel["name"])}</div>'
+                f'</button>'
+            )
+        related_html = (
+            f'<div class="svc-modal__related">'
+            f'<h4>{rel_label}</h4>'
+            f'<div class="svc-modal__related-grid">{"".join(rel_cards)}</div>'
+            f'</div>'
+        )
+
+
 
     # Build expandable risk profile if ratings exist
     ratings_html = ""
@@ -483,6 +658,16 @@ def _modal_html(service: dict, t: dict, lang: str = "sv") -> str:
         )
 
 
+    # Informationsbanner i modalen om resursen är på det andra språket
+    fallback_notice = ""
+    if service.get("is_fallback"):
+        orig = service.get("original_lang")
+        notice_text = (
+            "Denna resurs finns för närvarande endast tillgänglig på engelska."
+            if orig == "en"
+            else "This resource is currently only available in Swedish."
+        )
+        fallback_notice = f'<div class="svc-modal__lang-notice">{notice_text}</div>'
 
     return f"""<div class="svc-modal" id="svc-modal-{service['id']}" role="dialog" aria-modal="true"
   aria-labelledby="svc-modal-title-{service['id']}" hidden>
@@ -491,13 +676,14 @@ def _modal_html(service: dict, t: dict, lang: str = "sv") -> str:
     <button type="button" class="svc-modal__close" data-close="{service['id']}" aria-label="{t['close']}">&times;</button>
     <p class="svc-modal__icon">{_icon_html(service['icon'])}</p>
     <h2 class="svc-modal__title" id="svc-modal-title-{service['id']}">{html.escape(service['name'])}</h2>
+    {fallback_notice}
     <p class="svc-modal__provider">{_value_html(service['provider'])}</p>
     <p class="svc-modal__summary">{_value_html(service['summary'])}</p>
     <div class="svc-modal__tags">{tags}</div>
     {ratings_html}
     <div class="svc-modal__sections">{sections}</div>
+    {related_html}
     <div class="svc-modal__actions">
-      <a class="svc-btn" href="{service['page']}">{t['about']}</a>
       {link}
     </div>
   </div>
@@ -515,29 +701,115 @@ def _options(values) -> str:
     )
 
 
-def _archive_html(services: list[dict], t: dict, lang: str = "sv") -> str:
+def _archive_html(services: list[dict], t: dict, lang: str = "sv", page=None) -> str:
     if not services:
         return f'<p class="svc-empty">{t["empty"]}</p>'
+
+    # Räkna ut relativ sökväg till roten från sidans faktiska destinationsmapp:
+    # Engelska (dest: services/index.html) -> 1 nivå upp ("../")
+    # Svenska  (dest: sv/services/index.html) -> 2 nivåer upp ("../../")
+    depth = 0
+    if page and hasattr(page, "file") and getattr(page.file, "dest_uri", None):
+        dest_dir = os.path.dirname(page.file.dest_uri.replace(os.sep, "/"))
+        depth = len([p for p in dest_dir.split("/") if p])
+    
+    # Fallback om dest_uri saknas
+    if depth == 0:
+        depth = 2 if lang == "sv" else 1
+
+    rel_root = "../" * depth
+    feed_url = f"{rel_root}services-{lang}.xml"
+
+    # 1. Bygg dropdown-options för leverantörer och funktionsgrupper
     providers = _options(s["provider"] for s in services)
     groups = _options(s["group"] for s in services)
-    types = _options(s["type"] for s in services)
+
+    # 2. Samla alla unika taggar och bygg options för tagg-dropdownen
+    all_tag_labels = {tag["label"] for s in services for tag in s.get("tags", []) if tag.get("label")}
+    tags_options = _options(all_tag_labels)
+
     cards = "".join(_card_html(s, lang) for s in services)
     modals = "".join(_modal_html(s, t, lang) for s in services)
+    type_tabs = _type_tabs_html(services, lang)
+
+    tag_label = "Alla taggar / ämnen" if lang == "sv" else "All topics / tags"
+    rss_title = "RSS-flöde för tjänster och guider" if lang == "sv" else "RSS feed for services and guides"
+
+    # SVG för klassisk ren RSS-ikon
+    rss_svg = (
+        '<svg class="svc-rss-icon" viewBox="0 0 24 24" width="16" height="16" '
+        'fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">'
+        '<path d="M4 11a9 9 0 0 1 9 9"></path>'
+        '<path d="M4 4a16 16 0 0 1 16 16"></path>'
+        '<circle cx="5" cy="19" r="1.5" fill="currentColor"></circle>'
+        '</svg>'
+    )
 
     return f"""<div class="svc-archive" data-count="{len(services)}"
   data-label-of="{t['of']}" data-label-items="{t['items']}">
+  {type_tabs}
   <form class="svc-filters" role="search" onsubmit="return false;">
     <input type="search" class="svc-filters__search" name="q" placeholder="{t['search']}" aria-label="{t['search_label']}">
     <select name="provider" aria-label="{t['provider']}"><option value="">{t['provider']}</option>{providers}</select>
     <select name="group" aria-label="{t['group']}"><option value="">{t['group']}</option>{groups}</select>
-    <select name="type" aria-label="{t['type']}"><option value="">{t['type']}</option>{types}</select>
+    <select name="tag" aria-label="{tag_label}"><option value="">{tag_label}</option>{tags_options}</select>
     <button type="button" class="svc-filters__reset" disabled>{t['reset']}</button>
+    <a href="{feed_url}" class="svc-filters__rss" title="{rss_title}" aria-label="{rss_title}" target="_blank">
+      {rss_svg}
+      <span class="svc-filters__rss-label">RSS</span>
+    </a>
   </form>
   <p class="svc-count" aria-live="polite"></p>
   <div class="svc-grid">{cards}</div>
   <p class="svc-noresults" hidden>{t['noresults']}</p>
   <div class="svc-modals">{modals}</div>
 </div>"""
+
+
+
+
+def _type_tabs_html(services: list[dict], lang: str) -> str:
+    counts = {"all": len(services), "service": 0, "guide": 0, "checklist": 0, "support": 0}
+    for s in services:
+        t = s.get("type", "service")
+        if t in counts:
+            counts[t] += 1
+
+    labels = {
+        "en": {
+            "all": "All resources",
+            "service": "Tools",
+            "guide": "Guides",
+            "checklist": "Checklists",
+            "support": "Support & Advice"
+        },
+        "sv": {
+            "all": "Alla resurser",
+            "service": "Verktyg",
+            "guide": "Guider",
+            "checklist": "Checklistor",
+            "support": "Stöd & Rådgivning"
+        }
+    }.get(lang, {"all": "All resources", "service": "Services & Tools", "guide": "Guides", "checklist": "Checklists", "support": "Support & Advice"})
+
+    buttons = []
+    for t in ["all", "service", "guide", "checklist", "support"]:
+        # Visa fliken om det är "all" eller om det finns kort av den typen
+        if t != "all" and counts.get(t, 0) == 0:
+            continue
+            
+        active = " is-active" if t == "all" else ""
+        label = labels.get(t, t.title())
+        count = counts.get(t, 0)
+        
+        buttons.append(
+            f'<button type="button" class="svc-type-tab svc-type-tab--{t}{active}" data-filter-type="{t}">'
+            f'<span class="svc-type-tab__label">{label}</span>'
+            f'<span class="svc-type-tab__count">{count}</span>'
+            f'</button>'
+        )
+
+    return f'<div class="svc-type-tabs" role="tablist">{"".join(buttons)}</div>'
 
 
 def on_page_markdown(markdown, page, config, files, **kwargs):
@@ -548,5 +820,133 @@ def on_page_markdown(markdown, page, config, files, **kwargs):
     services = _collect(page, config)
     return markdown.replace(MARKER, _archive_html(services, LABELS[lang], lang))
 
+def _generate_rss_xml(services: list[dict], site_url: str, lang: str) -> str:
+    """Generates an RSS 2.0 feed for digital services and resources."""
+    base_url = site_url.rstrip("/")
+    feed_url = f"{base_url}/services-{lang}.xml"
+    catalog_url = f"{base_url}/{lang}/services/"
+
+    title = (
+        "KTH Digitala tjänster & forskningsresurser"
+        if lang == "sv"
+        else "KTH Digital Services & Research Resources"
+    )
+    description = (
+        "Uppdateringar och nya tillägg bland forskningsnära tjänster och guider vid KTH."
+        if lang == "sv"
+        else "Updates and additions across research services and guides at KTH."
+    )
+
+    now_rfc822 = format_datetime(datetime.now(timezone.utc))
+
+    # Sortera så nyast uppdaterade kommer överst
+    sorted_services = sorted(
+        services,
+        key=lambda s: s.get("date") or datetime.min.replace(tzinfo=timezone.utc),
+        reverse=True,
+    )
+
+    items_xml = []
+    for s in sorted_services:
+        item_id = s.get("id", "")
+        item_link = f"{catalog_url}?service={item_id}"
+        
+        # Markera eventuell cross-language fallback i titeln
+        item_title = str(s.get("name") or item_id)
+        if s.get("is_fallback"):
+            item_title += " [In English]" if s.get("original_lang") == "en" else " [På svenska]"
+
+        # Formatera pubDate till RFC-822
+        pub_dt = s.get("date")
+        if isinstance(pub_dt, datetime):
+            pub_date_str = format_datetime(pub_dt)
+            guid_suffix = pub_dt.strftime("%Y-%m-%d")
+        else:
+            pub_date_str = now_rfc822
+            guid_suffix = "latest"
+
+        guid = f"{base_url}/{lang}/services/{item_id}#{guid_suffix}"
+        item_desc = str(s.get("summary") or s.get("description") or "")
+
+        # Kategorier: provider, typ samt eventuella tagg-labels (aldrig dict-objekt eller 'Missing data')
+        categories: list[str] = []
+        
+        prov = s.get("provider")
+        if prov and prov != MISSING and prov not in categories:
+            categories.append(str(prov))
+            
+        stype = s.get("type")
+        if stype and stype != MISSING and stype not in categories:
+            categories.append(str(stype))
+
+        for t in s.get("tags") or []:
+            # t är en dict {"label": ..., "kind": ..., "value": ...}
+            t_label = t.get("label") if isinstance(t, dict) else str(t)
+            if t_label and t_label != MISSING and t_label not in categories:
+                categories.append(str(t_label))
+
+        cat_elements = "\n".join(
+            f"      <category>{xml_escape(cat)}</category>" for cat in categories
+        )
+
+        items_xml.append(f"""    <item>
+      <title>{xml_escape(item_title)}</title>
+      <link>{xml_escape(item_link)}</link>
+      <guid isPermaLink="false">{xml_escape(guid)}</guid>
+      <pubDate>{pub_date_str}</pubDate>
+      <description>{xml_escape(item_desc)}</description>
+{cat_elements}
+    </item>""")
+
+    joined_items = "\n".join(items_xml)
+
+    return f"""<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>{xml_escape(title)}</title>
+    <link>{xml_escape(catalog_url)}</link>
+    <description>{xml_escape(description)}</description>
+    <language>{lang}</language>
+    <lastBuildDate>{now_rfc822}</lastBuildDate>
+    <atom:link href="{xml_escape(feed_url)}" rel="self" type="application/rss+xml" />
+{joined_items}
+  </channel>
+</rss>
+"""
+
+
+def on_post_build(config, **kwargs):
+    """Skriver RSS 2.0 XML-filer till site_dir efter att sajten byggts."""
+    site_dir = config["site_dir"]
+    docs_dir = config["docs_dir"]
+    site_url = config.get("site_url") or ""
+
+    for lang in ("sv", "en"):
+        # Hitta katalogen för språket
+        lang_services_dir = os.path.join(docs_dir, lang, "services")
+        other_lang = "en" if lang == "sv" else "sv"
+        other_services_dir = os.path.join(docs_dir, other_lang, "services")
+
+        current_services = _scan_dir(lang_services_dir, docs_dir)
+        other_services = _scan_dir(other_services_dir, docs_dir)
+
+        services_dict = dict(current_services)
+        for svc_id, svc in other_services.items():
+            if svc_id not in services_dict:
+                fb = dict(svc)
+                fb["is_fallback"] = True
+                fb["original_lang"] = other_lang
+                services_dict[svc_id] = fb
+
+        services = list(services_dict.values())
+        rss_content = _generate_rss_xml(services, site_url, lang)
+
+        out_path = os.path.join(site_dir, f"services-{lang}.xml")
+        try:
+            with open(out_path, "w", encoding="utf-8") as f:
+                f.write(rss_content)
+            log.info("services: wrote RSS feed to %s", out_path)
+        except Exception as e:
+            log.error("services: failed to write RSS feed %s: %s", out_path, e)
 
 

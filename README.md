@@ -75,6 +75,78 @@ avoid it being copied to the published `site/` tree.
 If you want to add an article or guide to this Workspace you will find
 [instructions on our Contributions page](https://kth-library.github.io/kth-datahub-workspace/how_to_guides/contribute/#how-to-add-an-article-or-guide-to-the-workspace).
 
+### Adding a Card (Service, Guide, Checklist, Support)
+
+All catalogue cards are automatically discovered from Markdown files. You **do not** need to register them in `mkdocs.yml` `nav`.
+
+#### 1. File placement
+- English version: `docs/en/services/[subfolder/]<id>.md`
+- Swedish version: `docs/sv/services/[subfolder/]<id>.md`
+- Files can be stored directly in `services/` or organized in subdirectories (e.g., `tools/`, `guides/`, `checklists/`, `support/`).
+- **Important:** The filename `<id>.md` must be identical in both language directories so the engine can pair them.
+
+---
+
+#### 2. Complete Template Example
+
+```yaml
+---
+name: Zenodo Research Storage
+type: service              # service, guide, checklist, or support
+provider: CERN
+group: Research Data Storage
+tags:
+  - Open Access
+  - DOI
+  - FAIR Data
+last_updated: 2026-10-04    # YYYY-MM-DD: sets publication date in RSS feeds
+link: https://zenodo.org    # Always link to a webpage (avoid direct mailto:)
+button_text: Open service  # Optional: overrides default button label
+related:
+  - kth-onedrive           # Bi-directional: links both cards automatically
+rating:                    # Traffic light assessment (optional)
+  legal:
+    status: green
+    note: GDPR compliant within the EU
+  ip:
+    status: green
+  security:
+    status: yellow
+    note: Only approved for data classification up to Level 2
+  cost:
+    status: green
+    note: Free of charge up to 50 GB per dataset
+  support:
+    status: yellow
+    note: Community-driven and CERN helpdesk
+---
+
+A brief summary displayed on the card face in the catalogue grid. Keep this to 1–3 concise sentences.
+
+## About the service
+
+Every second-level heading (`##`) automatically becomes a collapsible accordion section inside the details modal.
+
+Standard Markdown tables are fully supported inside any section:
+
+| Feature | Details | Supported |
+| :--- | :--- | :---: |
+| Maximum upload | 50 GB per dataset | Yes |
+| Persistent ID | Automatic DOI minting | Yes |
+| Versioning | GitHub release integration | Yes |
+
+## Architecture
+
+Images are supported and will automatically scale responsively inside the modal:
+
+![Service Architecture](../../assets/images/zenodo-architecture.png)
+
+## Getting started
+
+- Log in using your ORCID or GitHub account.
+- Select your research community or repository.
+- Upload your dataset and complete the required metadata fields.
+
 
 ### Local development
 
@@ -120,6 +192,31 @@ CI build pipeline (to avoid surprises):
 uv run mkdocs build --clean --strict -v
 ```
 
+---
+## Field & Feature Reference
+Feature	Details
+Date (last_updated)	YYYY-MM-DD. Dictates card publication in the language RSS feeds (/services-en.xml and /services-sv.xml). Update this date when significant content changes are published. (Fallback: file modification timestamp).
+
+Tables	Standard Markdown pipe syntax | col | col | inside any ## section. Rendered with neat borders and zebra striping inside the modal accordions.
+
+Images	Standard Markdown ![alt text](../../path/to/image.png). Images are constrained to max-width: 100% so they never overflow the modal container.
+
+Card Types (type)	service (tools/services), guide, checklist, or support. Controls the card's color-coded icon, top filter tabs, and default action button text.
+
+Buttons (link & button_text)	Target destination URL. Default label is "Open service / Öppna tjänsten" for services, and "More information / Mer information" for guides, checklists, and support. Override at any time with button_text: "Custom label".
+
+Headings (##)	Text before the first ## is the front card summary. Every subsequent ## Heading becomes an expandable accordion inside the details modal.
+
+Traffic Lights (rating)	Dimensions: legal, ip, security, cost, support. Allowed statuses: green, yellow, red. The overall badge displays the worst rating among critical categories (legal, ip, security). 
+Missing critical ratings show as incomplete (grey).
+
+Assessment Notes (note)	Optional explanations per rating dimension. Clicking the traffic light in the modal expands these notes for full transparency.
+
+Bi-directional Relations (related)	List of other card IDs (e.g. related: [kth-onedrive, gitlab]). Defining it on one card automatically establishes mutual mini-card links in both modals.
+
+Tags (tags)	Keyword list. Displayed as badges on the card face, searchable via free text, and automatically aggregated in the tag filter dropdown.
+
+Cross-language Fallback	If a card only exists in one language, it is still displayed in both language catalogues with an [In English] or [På svenska] badge and an informational notice inside the modal.--
 
 ## Other ways to contribute
 
