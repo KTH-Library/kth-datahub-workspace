@@ -45,6 +45,7 @@ support at KTH, built with MkDocs and deployed to GitHub Pages.
 │   └── CHANGELOG.md            # Catalogue change log
 ├── docs/                       # All Workspace content (pages, assets, etc.)
 │   ├── en/                     # English-language content
+│   │   ├── index.md            # Landing page (English)
 │   │   ├── how_to_guides       # 
 │   │   ├── methodologies       # 
 │   │   ├── ...                 # 
@@ -52,6 +53,7 @@ support at KTH, built with MkDocs and deployed to GitHub Pages.
 │   │       ├── index.md        # Overview page (holds the ARCHIVE comment marker)
 │   │       └── <service>.md    # One Markdown file per service
 │   ├── sv/                     # Swedish-language content
+│   │   ├── index.md            # Landing page (Swedish)
 │   │   ├── how_to_guides       # 
 │   │   ├── methodologies       # 
 │   │   ├── ...                 # 
