@@ -20,7 +20,8 @@ rating:
       Tillhandahålls genom en centralt förvaltad KTH-IT tjänst.
   ip: green
   security:
-    status: green
+    # grey until we can assess it
+    status: grey
     note: >
       Integrerad med KTH IT identitetshantering och säkerhetskontroller.
   cost:

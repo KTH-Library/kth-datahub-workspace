@@ -14,11 +14,13 @@ access: >
 link: https://zenodo.org
 link_requires_login: false
 rating:
-  legal:    green
-  ip:       green
-  security: green
+  legal:    yellow
+  # ännu ej bedömt
+  ip:       grey
+  security: grey
   cost:     green
-  support:  yellow
+  # grönt eftersom vi kan erbjuda hjälp
+  support:  green
 ---
 
 ## Access

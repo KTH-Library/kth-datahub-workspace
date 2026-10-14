@@ -15,7 +15,8 @@ access: >
 link: https://open-science-cloud.ec.europa.eu
 link_requires_login: true
 rating:
-  legal:   green
+   # saknas avtal, får vara gul tills vidare
+  legal:   yellow
   cost:    green
   support: yellow
 ---

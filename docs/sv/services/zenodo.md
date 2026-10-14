@@ -14,11 +14,13 @@ access: >
 link: https://zenodo.org
 link_requires_login: false
 rating:
-  legal:    green
-  ip:       green
-  security: green
+  legal:    yellow
+  # ip och security ännu ej bedömt
+  ip:       grey
+  security: grey
   cost:     green
-  support:  yellow
+  # vi kan erbjuda hjälp/kurering på Zenodo KTH Community
+  support:  green
 ---
 
 ## Åtkomst

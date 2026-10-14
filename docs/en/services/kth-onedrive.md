@@ -20,7 +20,8 @@ rating:
       Provided through a centrally managed institutional service.
   ip: green
   security:
-    status: green
+    # grey until we can assess it
+    status: grey
     note: >
       Integrated with institutional identity management and security controls.
   cost:
