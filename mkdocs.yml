@@ -67,6 +67,9 @@ markdown_extensions:
       pygments_lang_class: true
   - pymdownx.tabbed:
       alternate_style: true
+  # The emoji configuration enables the use of icons and emojis by using simple shortcodes
+  # which can be discovered through the icon search:
+  # https://squidfunk.github.io/mkdocs-material/reference/icons-emojis/#search
   - pymdownx.emoji:
       emoji_index: !!python/name:material.extensions.emoji.twemoji
       emoji_generator: !!python/name:material.extensions.emoji.to_svg

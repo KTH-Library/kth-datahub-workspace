@@ -1,6 +1,5 @@
 ---
 name: SUNET Drive
-# how to tell which icons are available to pick from?
 icon: material/cloud-lock
 provider: SUNET
 group: Groupware
