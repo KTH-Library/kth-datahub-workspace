@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>KTH Digitala tjänster &amp; forskningsresurser</title>
+    <link>https://kth-library.github.io/kth-datahub-workspace/sv/services/</link>
+    <description>Uppdateringar och nya tillägg bland forskningsnära tjänster och guider vid KTH.</description>
+    <language>sv</language>
+    <lastBuildDate>Wed, 28 Oct 2026 12:56:28 +0000</lastBuildDate>
+    <atom:link href="https://kth-library.github.io/kth-datahub-workspace/services-sv.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>EOSC EU Node lagring</title>
+      <link>https://kth-library.github.io/kth-datahub-workspace/sv/services/?service=eosc-eu-node-storage</link>
+      <guid isPermaLink="false">https://kth-library.github.io/kth-datahub-workspace/sv/services/eosc-eu-node-storage#2026-10-28</guid>
+      <pubDate>Wed, 28 Oct 2026 12:56:20 +0000</pubDate>
+      <description>Lagring och beräkning i European Open Science Cloud, inklusive Jupyter notebooks i anslutning till data.
+</description>
+      <category>EOSC</category>
+      <category>service</category>
+      <category>Cloud services and compute</category>
+      <category>Storage</category>
+      <category>Research data</category>
+      <category>EU</category>
+    </item>
+    <item>
+      <title>GitHub</title>
+      <link>https://kth-library.github.io/kth-datahub-workspace/sv/services/?service=github</link>
+      <guid isPermaLink="false">https://kth-library.github.io/kth-datahub-workspace/sv/services/github#2026-10-28</guid>
+      <pubDate>Wed, 28 Oct 2026 12:56:20 +0000</pubDate>
+      <description>Proprietär plattform för delning, lagring och hantering av kod, med tillhörande funktioner för samarbeten kring projekt.
+</description>
+      <category>Microsoft</category>
+      <category>service</category>
+      <category>RDM</category>
+      <category>Versioning</category>
+      <category>Code</category>
+      <category>Global</category>
+    </item>
+    <item>
+      <title>KTH OneDrive</title>
+      <link>https://kth-library.github.io/kth-datahub-workspace/sv/services/?service=kth-onedrive</link>
+      <guid isPermaLink="false">https://kth-library.github.io/kth-datahub-workspace/sv/services/kth-onedrive#2026-10-28</guid>
+      <pubDate>Wed, 28 Oct 2026 12:56:20 +0000</pubDate>
+      <description>Personlig och delad molnlagring som ingår i KTH:s Microsoft 365-avtal, lämplig för löpande arbetsmaterial.
+</description>
+      <category>KTH IT</category>
+      <category>service</category>
+      <category>RDM</category>
+      <category>Storage</category>
+      <category>Work material</category>
+      <category>EU</category>
+    </item>
+    <item>
+      <title>SUNET Drive</title>
+      <link>https://kth-library.github.io/kth-datahub-workspace/sv/services/?service=sunet-drive</link>
+      <guid isPermaLink="false">https://kth-library.github.io/kth-datahub-workspace/sv/services/sunet-drive#2026-10-28</guid>
+      <pubDate>Wed, 28 Oct 2026 12:56:20 +0000</pubDate>
+      <description>Digital samarbetsplattform baserad på Nextcloud (öppen källkod) driftad av SUNET (en del av Vetenskapsrådet).
+</description>
+      <category>SUNET</category>
+      <category>service</category>
+      <category>Groupware</category>
+      <category>Storage</category>
+      <category>Work material</category>
+      <category>National</category>
+    </item>
+    <item>
+      <title>Zenodo</title>
+      <link>https://kth-library.github.io/kth-datahub-workspace/sv/services/?service=zenodo</link>
+      <guid isPermaLink="false">https://kth-library.github.io/kth-datahub-workspace/sv/services/zenodo#2026-10-28</guid>
+      <pubDate>Wed, 28 Oct 2026 12:56:20 +0000</pubDate>
+      <description>Allmänt repositorium för att publicera datamängder, programvara och annat forskningsresultat med DOI.
+</description>
+      <category>CERN / EU</category>
+      <category>service</category>
+      <category>FAIR</category>
+      <category>Publication</category>
+      <category>Open data</category>
+      <category>EU</category>
+    </item>
+    <item>
+      <title>Dropbox</title>
+      <link>https://kth-library.github.io/kth-datahub-workspace/sv/services/?service=dropbox</link>
+      <guid isPermaLink="false">https://kth-library.github.io/kth-datahub-workspace/sv/services/dropbox#2026-10-28</guid>
+      <pubDate>Wed, 28 Oct 2026 12:56:20 +0000</pubDate>
+      <description>Kommersiell fildelning som är vanlig i externa samarbeten men saknar centralt KTH-avtal.
+</description>
+      <category>Dropbox Inc.</category>
+      <category>service</category>
+      <category>RDM</category>
+      <category>Storage</category>
+      <category>Work material</category>
+      <category>Global</category>
+    </item>
+    <item>
+      <title>MaxQDA [In English]</title>
+      <link>https://kth-library.github.io/kth-datahub-workspace/sv/services/?service=maxqda</link>
+      <guid isPermaLink="false">https://kth-library.github.io/kth-datahub-workspace/sv/services/maxqda#2026-10-28</guid>
+      <pubDate>Wed, 28 Oct 2026 12:56:20 +0000</pubDate>
+      <description>MaxQDA is a computer-assisted qualitative data analysis application used for qualitative and mixed methods research.
+</description>
+      <category>VERBI GmbH</category>
+      <category>service</category>
+      <category>Desktop software</category>
+      <category>Analysis</category>
+      <category>Qualitative data</category>
+      <category>EU</category>
+    </item>
+    <item>
+      <title>Nvivo [In English]</title>
+      <link>https://kth-library.github.io/kth-datahub-workspace/sv/services/?service=nvivo-qda</link>
+      <guid isPermaLink="false">https://kth-library.github.io/kth-datahub-workspace/sv/services/nvivo-qda#2026-10-28</guid>
+      <pubDate>Wed, 28 Oct 2026 12:56:20 +0000</pubDate>
+      <description>Nvivo is a computer-assisted qualitative data analysis software which is used in the social sciences as well as fields such as forensics, tourism, and marketing.
+</description>
+      <category>Lumivero</category>
+      <category>service</category>
+      <category>Cloud services and compute</category>
+      <category>Analysis</category>
+      <category>Qualitative data</category>
+      <category>Global</category>
+    </item>
+    <item>
+      <title>Research Data Advisory Services [In English]</title>
+      <link>https://kth-library.github.io/kth-datahub-workspace/sv/services/?service=support-research-data</link>
+      <guid isPermaLink="false">https://kth-library.github.io/kth-datahub-workspace/sv/services/support-research-data#2026-10-28</guid>
+      <pubDate>Wed, 28 Oct 2026 12:56:20 +0000</pubDate>
+      <description>Tailored one-on-one advisory on Data Management Plans (DMPs), secure storage options, compliance, and archiving.</description>
+      <category>KTH Library &amp; IT</category>
+      <category>support</category>
+      <category>RDM</category>
+    </item>
+    <item>
+      <title>Sharing Data with External Partners [In English]</title>
+      <link>https://kth-library.github.io/kth-datahub-workspace/sv/services/?service=guide-sharing-data-externally</link>
+      <guid isPermaLink="false">https://kth-library.github.io/kth-datahub-workspace/sv/services/guide-sharing-data-externally#2026-10-28</guid>
+      <pubDate>Wed, 28 Oct 2026 12:56:20 +0000</pubDate>
+      <description>A practical guide on how to securely collaborate and share research data with partners outside KTH.</description>
+      <category>KTH Library</category>
+      <category>guide</category>
+      <category>RDM</category>
+    </item>
+    <item>
+      <title>Checklist for Dataset Publication [In English]</title>
+      <link>https://kth-library.github.io/kth-datahub-workspace/sv/services/?service=checklist-publishing-data</link>
+      <guid isPermaLink="false">https://kth-library.github.io/kth-datahub-workspace/sv/services/checklist-publishing-data#2026-10-28</guid>
+      <pubDate>Wed, 28 Oct 2026 12:56:20 +0000</pubDate>
+      <description>Verify that your dataset complies with the FAIR principles and KTH institutional policies prior to open release.</description>
+      <category>Research Data Office (RDO)</category>
+      <category>checklist</category>
+      <category>RDM</category>
+    </item>
+    <item>
+      <title>Atlas.ti [In English]</title>
+      <link>https://kth-library.github.io/kth-datahub-workspace/sv/services/?service=atlasti-qda</link>
+      <guid isPermaLink="false">https://kth-library.github.io/kth-datahub-workspace/sv/services/atlasti-qda#2026-10-28</guid>
+      <pubDate>Wed, 28 Oct 2026 12:56:20 +0000</pubDate>
+      <description>Atlas.ti is a computer-assisted qualitative data analysis software that facilitates analysis of qualitative data for qualitative research, quantitative research, and mixed methods research.
+</description>
+      <category>ATLAS.ti GmbH (Lumivero)</category>
+      <category>service</category>
+      <category>Cloud services and compute</category>
+      <category>Analysis</category>
+      <category>Qualitative data</category>
+      <category>Global</category>
+    </item>
+  </channel>
+</rss>

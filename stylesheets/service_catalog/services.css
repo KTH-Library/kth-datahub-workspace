@@ -1,0 +1,835 @@
+/* ==========================================================================
+   Digital service catalogue — cards, filters, tags and modal
+   --------------------------------------------------------------------------
+   Loaded through `extra_css` in mkdocs.yml. The class names here are a
+   contract with two other files and must not be renamed in isolation:
+     * service_catalog/hooks/services.py  — generates the markup
+     * docs/javascripts/service_catalog/services.js — toggles state
+
+   Colours come from Material's CSS variables wherever possible so the page
+   follows the site's light/dark palette. The few literal colours are the tag
+   families, which need distinct hues; each has a slate (dark mode) override
+   below to keep text contrast readable.
+   ========================================================================== */
+
+/* --- Type tabs ----------------------------------------------------------- */
+
+.svc-type-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .5rem;
+  margin: 1.2rem 0 .4rem;
+}
+
+.svc-type-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: .45rem;
+  padding: .35rem .75rem;
+  border-radius: 2rem;
+  border: 1px solid var(--md-default-fg-color--lighter);
+  background: var(--md-default-bg-color);
+  color: var(--md-default-fg-color--light);
+  font-size: .8rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all .15s ease;
+  user-select: none;
+}
+
+.svc-type-tab:hover {
+  border-color: var(--md-default-fg-color--light);
+  color: var(--md-default-fg-color);
+}
+
+.svc-type-tab:focus-visible {
+  outline: 2px solid var(--md-accent-fg-color);
+  outline-offset: 2px;
+}
+
+/* Siffra/räknare inuti fliken */
+.svc-type-tab__count {
+  display: inline-block;
+  padding: .1rem .4rem;
+  border-radius: 1rem;
+  background: var(--md-default-fg-color--lightest, rgba(0, 0, 0, .06));
+  font-size: .7rem;
+  font-weight: 600;
+  line-height: 1;
+}
+
+/* Aktiv flik: färgkodad efter typ */
+.svc-type-tab.is-active {
+  background: var(--md-accent-fg-color);
+  border-color: var(--md-accent-fg-color);
+  color: var(--md-accent-bg-color, #fff);
+}
+
+.svc-type-tab.is-active .svc-type-tab__count {
+  background: rgba(255, 255, 255, .25);
+  color: inherit;
+}
+
+/* Typ-specifika accentfärger vid aktiv flik */
+.svc-type-tab--service.is-active   { background: #1954a6; border-color: #1954a6; color: #fff; }
+.svc-type-tab--guide.is-active     { background: #7c3aed; border-color: #7c3aed; color: #fff; }
+.svc-type-tab--checklist.is-active { background: #d97706; border-color: #d97706; color: #fff; }
+.svc-type-tab--support.is-active   { background: #0d9488; border-color: #0d9488; color: #fff; }
+
+/* Slate / mörkt läge */
+[data-md-color-scheme="slate"] .svc-type-tab__count {
+  background: rgba(255, 255, 255, .08);
+}
+[data-md-color-scheme="slate"] .svc-type-tab--service.is-active   { background: #60a5fa; border-color: #60a5fa; color: #0f172a; }
+[data-md-color-scheme="slate"] .svc-type-tab--guide.is-active     { background: #a78bfa; border-color: #a78bfa; color: #0f172a; }
+[data-md-color-scheme="slate"] .svc-type-tab--checklist.is-active { background: #fbbf24; border-color: #fbbf24; color: #0f172a; }
+[data-md-color-scheme="slate"] .svc-type-tab--support.is-active   { background: #2dd4bf; border-color: #2dd4bf; color: #0f172a; }
+[data-md-color-scheme="slate"] .svc-type-tab.is-active .svc-type-tab__count {
+  background: rgba(0, 0, 0, .2);
+}
+
+
+/* --- Filter bar ---------------------------------------------------------- */
+
+.svc-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .6rem;
+  margin: 1.2rem 0 .6rem;
+}
+
+.svc-filters input[type="search"] {
+  flex: 1 1 16rem;
+}
+
+.svc-filters input,
+.svc-filters select,
+.svc-filters button {
+  font: inherit;
+  padding: .45rem .6rem;
+  border: 1px solid var(--md-default-fg-color--lighter);
+  border-radius: .3rem;
+  background: var(--md-default-bg-color);
+  color: var(--md-default-fg-color);
+}
+
+.svc-filters select {
+  cursor: pointer;
+}
+
+/* Hover/focus feedback: the controls are plain HTML elements, so without this
+   they give no indication of being interactive in the Material theme. */
+.svc-filters input:hover,
+.svc-filters select:hover {
+  border-color: var(--md-accent-fg-color);
+}
+
+.svc-filters input:focus-visible,
+.svc-filters select:focus-visible,
+.svc-filters button:focus-visible,
+.svc-card__open:focus-visible,
+.svc-tag:focus-visible,
+.svc-btn:focus-visible,
+.svc-modal__close:focus-visible {
+  outline: 2px solid var(--md-accent-fg-color);
+  outline-offset: 2px;
+}
+
+.svc-filters__reset:not(:disabled) {
+  cursor: pointer;
+  border-color: var(--md-accent-fg-color);
+  color: var(--md-accent-fg-color);
+}
+
+.svc-filters__reset:not(:disabled):hover {
+  background: var(--md-accent-fg-color);
+  color: var(--md-accent-bg-color, #fff);
+}
+
+/* Disabled means "nothing to clear"; dimming alone is enough because the
+   button is also `disabled` and therefore skipped by assistive tech. */
+.svc-filters__reset:disabled {
+  opacity: .5;
+}
+
+.svc-count {
+  font-size: .75rem;
+  color: var(--md-default-fg-color--light);
+  margin: 0 0 1rem;
+}
+
+/* --- Card grid ----------------------------------------------------------- */
+
+.svc-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr));
+  gap: 1rem;
+}
+
+.svc-card[hidden] {
+  display: none !important;
+}
+
+.svc-card {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--md-default-fg-color--lightest);
+  border-radius: .4rem;
+  background: var(--md-default-bg-color);
+  transition: border-color .15s, box-shadow .15s;
+}
+
+/* IMPORTANT — do not remove.
+   The script hides non-matching cards by setting the `hidden` attribute. The
+   browser's built-in rule for `[hidden]` is `display: none`, but it has lower
+   specificity than the `.svc-card { display: flex }` rule above, so without
+   this override every card stays visible while the counter says otherwise.
+   That was the original filtering bug. Any new rule that sets `display` on a
+   hideable element needs the same companion rule (see `.svc-modal[hidden]`). */
+.svc-card[hidden] {
+  display: none;
+}
+
+.svc-card:hover {
+  border-color: var(--md-accent-fg-color);
+  box-shadow: 0 .15rem .6rem rgba(0, 0, 0, .12);
+}
+
+/* The whole upper part of a card is one button, so a click anywhere on the
+   title, provider or summary opens the modal. */
+.svc-card__open {
+  position: relative;
+  display: block;
+  flex: 1;
+  text-align: left;
+  cursor: pointer;
+  padding: 1rem 1rem .4rem;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+}
+
+.svc-icon svg {
+  width: 1.6rem;
+  height: 1.6rem;
+  fill: currentColor;
+}
+
+.svc-card__icon {
+  display: block;
+  color: var(--md-accent-fg-color);
+}
+
+/* -------------------------------------------------------------------------
+ * Card Type Colors (Symbol uppe till vänster)
+ * ------------------------------------------------------------------------- */
+
+/* Säkerställ att ikonen/SVG ärver textfärgen */
+.svc-card__icon svg,
+.svc-modal__icon svg {
+  fill: currentColor;
+}
+
+/* 1. Tjänster (Service) – KTH-blå */
+.svc-card__icon--service,
+.svc-modal__icon--service {
+  color: #1954a6;
+}
+
+/* 2. Guider (Guide) – Violett / Kunskapslila */
+.svc-card__icon--guide,
+.svc-modal__icon--guide {
+  color: #7c3aed;
+}
+
+/* 3. Checklistor (Checklist) – Bärnsten / Guld */
+.svc-card__icon--checklist,
+.svc-modal__icon--checklist {
+  color: #d97706;
+}
+
+/* 4. Stödverksamhet (Support) – Teal / Skogsgrön */
+.svc-card__icon--support,
+.svc-modal__icon--support {
+  color: #0d9488;
+}
+
+/* -------------------------------------------------------------------------
+ * Mörkt läge (Dark mode / Slate) – Ljusare nyanser för god läsbarhet
+ * ------------------------------------------------------------------------- */
+[data-md-color-scheme="slate"] .svc-card__icon--service,
+[data-md-color-scheme="slate"] .svc-modal__icon--service {
+  color: #60a5fa;
+}
+
+[data-md-color-scheme="slate"] .svc-card__icon--guide,
+[data-md-color-scheme="slate"] .svc-modal__icon--guide {
+  color: #a78bfa;
+}
+
+[data-md-color-scheme="slate"] .svc-card__icon--checklist,
+[data-md-color-scheme="slate"] .svc-modal__icon--checklist {
+  color: #fbbf24;
+}
+
+[data-md-color-scheme="slate"] .svc-card__icon--support,
+[data-md-color-scheme="slate"] .svc-modal__icon--support {
+  color: #2dd4bf;
+}
+
+
+.svc-card__title {
+  display: block;
+  font-weight: 700;
+  margin: .4rem 0 .1rem;
+}
+
+.svc-card__provider {
+  display: block;
+  font-size: .7rem;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  color: var(--md-default-fg-color--light);
+}
+
+.svc-card__summary {
+  display: block;
+  margin-top: .5rem;
+  font-size: .78rem;
+  line-height: 1.5;
+  color: var(--md-default-fg-color--light);
+}
+
+/* --- Tags ---------------------------------------------------------------- */
+
+.svc-card__tags,
+.svc-modal__tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .3rem;
+  padding: .4rem 1rem 1rem;
+}
+
+.svc-modal__tags {
+  padding: .2rem 0 1rem;
+}
+
+.svc-tag {
+  cursor: pointer;
+  font: inherit;
+  font-size: .65rem;
+  line-height: 1;
+  padding: .3rem .5rem;
+  border-radius: 1rem;
+  border: 1px solid transparent;
+}
+
+.svc-tag:hover {
+  filter: brightness(1.08);
+  text-decoration: underline;
+}
+
+/* One hue per tag family; the suffix matches TAG_GROUPS in services.py. */
+.svc-tag--provider { background: #1b5e9a1a; border-color: #1b5e9a66; color: #14507f; }
+.svc-tag--group    { background: #0b7a5c1a; border-color: #0b7a5c66; color: #07604a; }
+.svc-tag--type     { background: #7b3fa01a; border-color: #7b3fa066; color: #67338a; }
+.svc-tag--data     { background: #a8570a1a; border-color: #a8570a66; color: #8a4708; }
+.svc-tag--location { background: #4a4a4a1a; border-color: #4a4a4a66; color: #3d3d3d; }
+
+/* Dark mode: the light-mode hues fall below 4.5:1 on the slate background, so
+   each family gets a lighter variant instead. */
+[data-md-color-scheme="slate"] .svc-tag--provider { color: #9ecbf0; }
+[data-md-color-scheme="slate"] .svc-tag--group    { color: #86d8be; }
+[data-md-color-scheme="slate"] .svc-tag--type     { color: #cfb0ea; }
+[data-md-color-scheme="slate"] .svc-tag--data     { color: #ecc188; }
+[data-md-color-scheme="slate"] .svc-tag--location { color: #cfcfcf; }
+
+/* Missing information is shown, never hidden — see MISSING in services.py. */
+.svc-missing {
+  color: #8a4708;
+  font-style: italic;
+}
+
+[data-md-color-scheme="slate"] .svc-missing { color: #ecc188; }
+
+/* -------------------------------------------------------------------------
+ * Traffic light ratings
+ * ------------------------------------------------------------------------- */
+
+.svc-traffic-badge {
+  display: inline-block;
+  width: 0.65rem;
+  height: 0.65rem;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+/* Placement on the card (top right corner) */
+.svc-card .svc-traffic-badge {
+  position: absolute;
+  top: 0.85rem;
+  right: 0.85rem;
+  width: 0.75rem;
+  height: 0.75rem;
+  box-shadow: 0 0 0 2px var(--md-default-bg-color);
+}
+
+/* Rating colors */
+.svc-traffic-badge--green   { background-color: #2e7d32; }
+.svc-traffic-badge--yellow  { background-color: #f59e0b; }
+.svc-traffic-badge--red     { background-color: #d32f2f; }
+.svc-traffic-badge--grey    { background-color: #9e9e9e; }
+.svc-traffic-badge--missing {
+  background-color: transparent;
+  border: 1.5px dashed #9e9e9e;
+  box-sizing: border-box;
+}
+
+/* Rating colors in dark mode */
+[data-md-color-scheme="slate"] .svc-traffic-badge--green   { background-color: #4ade80; }
+[data-md-color-scheme="slate"] .svc-traffic-badge--yellow  { background-color: #fbbf24; }
+[data-md-color-scheme="slate"] .svc-traffic-badge--red     { background-color: #f87171; }
+[data-md-color-scheme="slate"] .svc-traffic-badge--grey    { background-color: #64748b; }
+[data-md-color-scheme="slate"] .svc-traffic-badge--missing { border-color: #64748b; }
+
+/* -------------------------------------------------------------------------
+ * Expandable ratings inside modal
+ * ------------------------------------------------------------------------- */
+
+.svc-modal__ratings-details {
+  margin: 1rem 0;
+  border-radius: 0.5rem;
+  border: 1px solid var(--md-default-fg-color--lightest);
+  background: var(--md-default-fg-color--lightest);
+  overflow: hidden;
+  transition: border-color 0.2s ease;
+}
+
+.svc-modal__ratings-details[open] {
+  border-color: var(--md-default-fg-color--lighter);
+}
+
+/* Clickable summary header */
+.svc-modal__ratings-summary {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.75rem 1rem;
+  cursor: pointer;
+  user-select: none;
+  font-size: 0.85rem;
+  color: var(--md-default-fg-color);
+  list-style: none; /* Hide default browser arrow */
+}
+/* Ta bort MkDocs Materials inbyggda blå ikon från vår summary */
+.svc-modal__ratings-summary::before {
+  display: none !important;
+  content: none !important;
+}
+
+/* Tvinga luft och avstånd mellan trafikljuspricken och texten */
+.svc-modal__ratings-summary .svc-traffic-badge {
+  margin-right: 0.65rem;
+  flex-shrink: 0;
+}
+
+.svc-modal__ratings-summary::-webkit-details-marker {
+  display: none; /* Hide Chrome/Safari arrow */
+}
+
+/* Custom expand indicator arrow on the right */
+.svc-modal__ratings-summary::after {
+  content: "";
+  display: inline-block;
+  margin-left: auto;
+  width: 0.45rem;
+  height: 0.45rem;
+  border-right: 2px solid var(--md-default-fg-color--light);
+  border-bottom: 2px solid var(--md-default-fg-color--light);
+  transform: rotate(-45deg);
+  transition: transform 0.2s ease;
+}
+
+.svc-modal__ratings-details[open] .svc-modal__ratings-summary::after {
+  transform: rotate(45deg);
+}
+
+.svc-modal__ratings-summary:hover {
+  background: rgba(0, 0, 0, 0.03);
+}
+
+[data-md-color-scheme="slate"] .svc-modal__ratings-summary:hover {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.svc-modal__ratings-summary-text {
+  flex: 1;
+}
+
+/* Expanded list */
+.svc-modal__rating-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  padding: 0.8rem 1rem 1rem;
+  border-top: 1px solid var(--md-default-fg-color--lighter);
+}
+
+.svc-modal__rating-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.svc-modal__rating-header {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: 0.82rem;
+}
+
+.svc-modal__rating-dim {
+  font-weight: 500;
+  min-width: 12rem;
+}
+
+.svc-modal__rating-val {
+  color: var(--md-default-fg-color--light);
+}
+
+/* Explanatory note under each dimension */
+.svc-modal__rating-note {
+  margin: 0.15rem 0 0 1.25rem !important; /* aligned under the text, past the dot */
+  font-size: 0.78rem !important;
+  line-height: 1.4 !important;
+  color: var(--md-default-fg-color--light) !important;
+}
+
+
+
+
+/* Modal */
+/* --- Modal --------------------------------------------------------------- */
+
+/* Same specificity fix as `.svc-card[hidden]` above: the modal sets
+   `display: flex`, so the built-in `[hidden]` rule needs to be restated. */
+.svc-modal[hidden] { display: none; }
+
+.svc-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 3vh 1rem;
+  overflow-y: auto;
+}
+
+.svc-modal__backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, .55);
+}
+
+.svc-modal__panel {
+  position: relative;
+  width: min(42rem, 100%);
+  background: var(--md-default-bg-color);
+  border-radius: .5rem;
+  padding: 1.6rem;
+  box-shadow: 0 1rem 2rem rgba(0, 0, 0, .3);
+}
+
+.svc-modal__close {
+  position: absolute;
+  top: .4rem;
+  right: .6rem;
+  font-size: 1.6rem;
+  line-height: 1;
+  background: none;
+  border: 0;
+  cursor: pointer;
+  color: var(--md-default-fg-color--light);
+}
+
+.svc-modal__close:hover { color: var(--md-accent-fg-color); }
+
+.svc-modal__icon { color: var(--md-accent-fg-color); margin: 0; }
+.svc-modal__title { margin: .2rem 0 .1rem; }
+
+.svc-modal__provider {
+  margin: 0;
+  font-size: .7rem;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  color: var(--md-default-fg-color--light);
+}
+
+.svc-modal__summary { margin: .6rem 0 .4rem; }
+
+/* -------------------------------------------------------------------------
+ * Modal Collapsible Sections (<details>)
+ * ------------------------------------------------------------------------- */
+
+/* Sections are native <details>, so they work without JavaScript. */
+.svc-section {
+  border-top: 1px solid var(--md-default-fg-color--lightest);
+}
+
+/* Ta bort Material-temats standardikon (den blå pennan) */
+.svc-section > summary::before {
+  display: none !important;
+  content: none !important;
+}
+
+.svc-section > summary {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  cursor: pointer;
+  padding: 0.6rem 0;
+  font-weight: 700;
+}
+
+/* Den nya sektionsikonen */
+.svc-section > summary .svc-icon {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.svc-section > summary .svc-icon svg {
+  width: 1.15rem;
+  height: 1.15rem;
+  fill: var(--md-primary-fg-color);
+}
+
+.svc-section__body {
+  padding-bottom: 0.6rem;
+  font-size: 0.8rem;
+}
+
+
+/* --- Buttons and footer -------------------------------------------------- */
+
+.svc-modal__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .6rem;
+  margin-top: 1.2rem;
+}
+
+.svc-btn {
+  display: inline-block;
+  padding: .45rem .8rem;
+  border-radius: .3rem;
+  border: 1px solid var(--md-accent-fg-color);
+  color: var(--md-accent-fg-color);
+  font-size: .78rem;
+  text-decoration: none;
+}
+
+.svc-btn:hover {
+  background: var(--md-accent-fg-color);
+  color: var(--md-accent-bg-color, #fff);
+}
+
+.svc-btn--primary {
+  background: var(--md-accent-fg-color);
+  color: var(--md-accent-bg-color, #fff);
+}
+
+.svc-btn--primary:hover {
+  filter: brightness(1.08);
+}
+
+/* Prevents the page behind an open modal from scrolling. */
+body.svc-modal-open { overflow: hidden; }
+
+/* --- Relaterade resurser / Miniatyrkort i modalen --- */
+
+.svc-modal__related {
+  margin-top: 1.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--md-default-fg-color--lightest);
+}
+
+.svc-modal__related h4 {
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--md-default-fg-color--light);
+  margin: 0 0 0.8rem;
+}
+
+.svc-modal__related-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+  gap: 0.75rem;
+}
+
+.svc-mini-card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
+  padding: 0.75rem 0.9rem;
+  border-radius: 0.4rem;
+  border: 1px solid var(--md-default-fg-color--lighter);
+  background: var(--md-default-bg-color);
+  cursor: pointer;
+  transition: transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+  width: 100%;
+}
+
+.svc-mini-card:hover {
+  transform: translateY(-2px);
+  border-color: var(--md-accent-fg-color);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+}
+
+.svc-mini-card__header {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  gap: 0.45rem;
+  margin-bottom: 0.4rem;
+}
+
+.svc-mini-card__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.2rem;
+  height: 1.2rem;
+}
+
+.svc-mini-card__icon svg {
+  width: 1.1rem;
+  height: 1.1rem;
+  fill: currentColor;
+}
+
+.svc-mini-card__type {
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.svc-mini-card__arrow {
+  margin-left: auto;
+  font-size: 0.85rem;
+  opacity: 0.4;
+  transition: transform 0.15s ease, opacity 0.15s ease;
+}
+
+.svc-mini-card:hover .svc-mini-card__arrow {
+  opacity: 1;
+  transform: translateX(3px);
+}
+
+.svc-mini-card__title {
+  font-size: 0.82rem;
+  font-weight: 600;
+  line-height: 1.35;
+  color: var(--md-default-fg-color);
+}
+
+/* Färgkodning per korttyp */
+.svc-mini-card--service .svc-mini-card__icon,
+.svc-mini-card--service .svc-mini-card__type { color: #1954a6; }
+
+.svc-mini-card--guide .svc-mini-card__icon,
+.svc-mini-card--guide .svc-mini-card__type { color: #7c3aed; }
+
+.svc-mini-card--checklist .svc-mini-card__icon,
+.svc-mini-card--checklist .svc-mini-card__type { color: #d97706; }
+
+.svc-mini-card--support .svc-mini-card__icon,
+.svc-mini-card--support .svc-mini-card__type { color: #0d9488; }
+
+/* Slate / Dark Mode */
+[data-md-color-scheme="slate"] .svc-mini-card {
+  background: rgba(255, 255, 255, 0.03);
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
+[data-md-color-scheme="slate"] .svc-mini-card:hover {
+  background: rgba(255, 255, 255, 0.07);
+  border-color: rgba(255, 255, 255, 0.35);
+}
+
+[data-md-color-scheme="slate"] .svc-mini-card--service .svc-mini-card__icon,
+[data-md-color-scheme="slate"] .svc-mini-card--service .svc-mini-card__type { color: #60a5fa; }
+
+[data-md-color-scheme="slate"] .svc-mini-card--guide .svc-mini-card__icon,
+[data-md-color-scheme="slate"] .svc-mini-card--guide .svc-mini-card__type { color: #a78bfa; }
+
+[data-md-color-scheme="slate"] .svc-mini-card--checklist .svc-mini-card__icon,
+[data-md-color-scheme="slate"] .svc-mini-card--checklist .svc-mini-card__type { color: #fbbf24; }
+
+[data-md-color-scheme="slate"] .svc-mini-card--support .svc-mini-card__icon,
+[data-md-color-scheme="slate"] .svc-mini-card--support .svc-mini-card__type { color: #2dd4bf; }
+
+/* Språk-badge för fallback-kort */
+.svc-badge-lang {
+  display: inline-block;
+  font-size: 0.72rem;
+  font-weight: 600;
+  line-height: 1;
+  padding: 3px 6px;
+  border-radius: 4px;
+  background-color: var(--md-default-bg-color--lightest, rgba(255, 255, 255, 0.1));
+  border: 1px solid var(--md-default-fg-color--lightest, rgba(255, 255, 255, 0.2));
+  color: var(--md-default-fg-color, #e2e8f0);
+  vertical-align: middle;
+  margin-left: 6px;
+  white-space: nowrap;
+}
+
+/* Modal informationsbanner */
+.svc-modal__lang-notice {
+  background: rgba(59, 130, 246, 0.12);
+  border-left: 4px solid #3b82f6;
+  padding: 8px 12px;
+  margin: 12px 0 16px 0;
+  border-radius: 0 4px 4px 0;
+  font-size: 0.85rem;
+  color: var(--md-default-fg-color, #e2e8f0);
+}
+
+/* --- RSS-knapp i filterfältet -------------------------------------------- */
+
+.svc-filters__rss {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.4rem 0.65rem;
+  border: 1px solid var(--md-default-fg-color--lighter, #d1d5db);
+  border-radius: 0.25rem;
+  background: var(--md-default-bg-color, #fff);
+  color: var(--md-default-fg-color--light, #6b7280);
+  text-decoration: none !important;
+  font-size: 0.75rem;
+  font-weight: 600;
+  line-height: 1;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+
+.svc-filters__rss:hover {
+  border-color: #ee802f;
+  background: #fff8f2;
+  color: #ee802f;
+  box-shadow: 0 1px 3px rgba(238, 128, 47, 0.15);
+}
+
+.svc-filters__rss .svc-rss-icon {
+  flex-shrink: 0;
+  display: block;
+}
+
