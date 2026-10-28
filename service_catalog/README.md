@@ -41,8 +41,87 @@
   sprite sheet would be cleaner if the catalogue grows.
 
 
+## Adding a card (Service, Guide, Checklist, Support)
 
-## How to add a new service
+All catalogue cards are automatically discovered from Markdown files.
+You **do not** need to register them in the `nav` dict in `mkdocs.yml`.
+
+### File placement
+
+- English version: `docs/en/services/[subfolder/]<id>.md`
+- Swedish version: `docs/sv/services/[subfolder/]<id>.md`
+- Files can be stored directly in `services/` or organized in subdirectories
+  (e.g., `tools/`, `guides/`, `checklists/`, `support/`).
+- **Important:** The filename `<id>.md` must be identical in both language directories
+  so the engine can pair them.
+
+
+### Complete template example
+
+```yaml
+---
+name: Zenodo Research Storage
+type: service              # service, guide, checklist, or support
+provider: CERN
+group: Research Data Storage
+tags:
+  - Open Access
+  - DOI
+  - FAIR Data
+last_updated: 2026-10-04    # YYYY-MM-DD: sets publication date in RSS feeds
+link: https://zenodo.org    # Always link to a webpage (avoid direct mailto:)
+button_text: Open service  # Optional: overrides default button label
+related:
+  - kth-onedrive           # Bi-directional: links both cards automatically
+rating:                    # Traffic light assessment (optional)
+  legal:
+    status: green
+    note: GDPR compliant within the EU
+  ip:
+    status: green
+  security:
+    status: yellow
+    note: Only approved for data classification up to Level 2
+  cost:
+    status: green
+    note: Free of charge up to 50 GB per dataset
+  support:
+    status: yellow
+    note: Community-driven and CERN helpdesk
+---
+
+A brief summary displayed on the card face in the catalogue grid. Keep this to 1–3 sentences.
+
+## About the service
+
+Every second-level heading (`##`) automatically becomes a collapsible accordion section
+inside the details modal.
+
+Standard Markdown tables are fully supported inside any section:
+
+| Feature | Details | Supported |
+| :--- | :--- | :---: |
+| Maximum upload | 50 GB per dataset | Yes |
+| Persistent ID | Automatic DOI minting | Yes |
+| Versioning | GitHub release integration | Yes |
+
+## Architecture
+
+Images are supported and will automatically scale responsively inside the modal:
+
+![Service Architecture](../../assets/images/zenodo-architecture.png)
+
+## Getting started
+
+- Log in using your ORCID or GitHub account.
+- Select your research community or repository.
+- Upload your dataset and complete the required metadata fields.
+```
+
+
+## How to add a new service (old instructions)
+<!-- these are the old instructions, check that nothing is lost
+then merge them with the new "Adding a card" instructions above -->
 
 1. Create `docs/en/services/<slug>.md` **and** `docs/sv/services/<slug>.md`
    (same filename in both languages — the filename is the service id).
