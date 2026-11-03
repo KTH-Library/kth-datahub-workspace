@@ -60,6 +60,9 @@ markdown_extensions:
   - pymdownx.superfences
   - admonition
   - pymdownx.details
+  # attr_list and md_in_html enables the use of grids, allowing to bring blocks
+  # of identical or different types into a rectangular shape.
+  # https://squidfunk.github.io/mkdocs-material/reference/grids
   - attr_list
   - md_in_html
   - pymdownx.highlight:
@@ -137,7 +140,7 @@ plugins:
                 - Communities: knowledge_base/communities.md
                 - Hitta data: knowledge_base/finding-data.md
                 - Hitta lagring och beräkning: knowledge_base/storage.md
-                - Nationella resurser: knowledge_base/national.md
+                - Nationella resurser: knowledge_base/national-research-infrastructure.md
                 - Regelverksöversikt: knowledge_base/regulation.md
                 - Krav från finansiärer: knowledge_base/funder-mandates.md
                 - Krav från förlag: knowledge_base/publisher-requirements.md
@@ -173,7 +176,7 @@ nav:
       - Communities: knowledge_base/communities.md
       - Finding data: knowledge_base/finding-data.md
       - Finding storage and compute: knowledge_base/storage.md
-      - National resources: knowledge_base/national.md
+      - National resources: knowledge_base/national-research-infrastructure.md
       - Regulatory overview: knowledge_base/regulation.md
       - Funder mandates: knowledge_base/funder-mandates.md
       - Publisher requirements: knowledge_base/publisher-requirements.md

@@ -33,7 +33,7 @@
     - [Hitta data](knowledge_base/finding-data.md)
     - [Hitta digitala tjänster](services/index.md)
     - [Lagring och beräkning](knowledge_base/storage.md)
-    - [Nationella resurser](knowledge_base/national.md)
+    - [Nationella resurser](knowledge_base/national-research-infrastructure.md)
     - [Översikt regulatoriska krav](knowledge_base/regulation.md)
     - [Finansiärers krav](knowledge_base/funder-mandates.md)
     - [Krav från förlag vid publicering](knowledge_base/publisher-requirements.md)

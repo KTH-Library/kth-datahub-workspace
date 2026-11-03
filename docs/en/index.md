@@ -38,7 +38,7 @@ The TOC appear to rest on shaky foundations...
     - [Access data](knowledge_base/finding-data.md)
     - [Find digital services](services/index.md)
     - [Access storage and compute resources](knowledge_base/storage.md)
-    - [National infrastructure for research](knowledge_base/national.md)
+    - [National research infrastructure](knowledge_base/national-research-infrastructure.md)
     - [Regulatory overview](knowledge_base/regulation.md)
     - [Funder mandates](knowledge_base/funder-mandates.md)
     - [Publisher requirements](knowledge_base/publisher-requirements.md)
