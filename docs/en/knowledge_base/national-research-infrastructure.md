@@ -55,5 +55,5 @@ The national digital research infrastructure has some known pain points:
 + When using public cloud services, you must have a plan for for where your research data will end up
   when you wrap your research. Also, there is unfortunately no compliance service to provide you
   advice on what use-cases are suitable for public cloud offerings.
-+ There is currently no way to transfer data to or from NAISS compute services.
++ There is currently no standardized recommended way to transfer data to or from NAISS compute services.
 + There is currently no national platform for version control of code.
