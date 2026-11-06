@@ -9,8 +9,6 @@ location: EU
 summary: >
   Allmänt repositorium för att publicera datamängder, programvara och annat
   forskningsresultat med DOI.
-access: >
-  Öppet för alla; logga in med ORCID, GitHub eller ett Zenodo-konto.
 link: https://zenodo.org
 link_requires_login: false
 rating:
@@ -27,6 +25,7 @@ rating:
 
 Inget avtal och ingen ansökan krävs. Upp till 50 GB per post är kostnadsfritt,
 större datamängder kan begäras.
+Öppet för alla; logga in med ORCID, GitHub eller ett Zenodo-konto.
 
 ## Guider
 

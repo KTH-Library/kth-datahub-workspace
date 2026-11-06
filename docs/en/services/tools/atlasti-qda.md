@@ -6,15 +6,13 @@ icon: material/layers-search
 # acquired by Lumivero in 2024
 provider: ATLAS.ti GmbH (Lumivero)
 group: Cloud services and compute
-type: Analysis
+type: service
 data: Qualitative data
 location: Global
 summary: >
   Atlas.ti is a computer-assisted qualitative data analysis software that
   facilitates analysis of qualitative data for qualitative research,
   quantitative research, and mixed methods research.
-access: >
-  Personal or project-funded subscription required. No license nor support via KTH.
 link: https://atlasti.com
 link_requires_login: false
 rating:
@@ -34,7 +32,7 @@ rating:
 KTH does not offer a license nor support for Atlas.ti.
 
 To use the software, whether desktop or web version, the user must first
-register and create a user account.
+register and create a user account (personal or project-funded subscription required).
 Available for Windows, Mac, Android, iOS, and via a web-based cloud portal.
 
 

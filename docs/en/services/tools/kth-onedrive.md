@@ -3,14 +3,12 @@ name: KTH OneDrive
 icon: material/microsoft-onedrive
 provider: KTH IT
 group: RDM
-type: Storage
+type: service
 data: Work material
 location: EU
 summary: >
   Personal and shared cloud storage included in the KTH Microsoft 365 agreement,
   suited for day-to-day work files.
-access: >
-  Available to all staff and students with a KTH account.
 link: https://intra.kth.se/it/lagring
 link_requires_login: false
 rating:
@@ -34,8 +32,9 @@ rating:
 
 ## Access
 
-Log in with your KTH account. No application or extra cost for the individual
-researcher; the service is part of the central agreement.
+Available to all staff and students with a KTH account. Log in with your KTH account.
+No application or extra cost for the individual researcher;
+the service is part of the central agreement.
 
 ## Guides
 

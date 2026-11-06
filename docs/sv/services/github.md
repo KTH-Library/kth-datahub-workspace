@@ -9,9 +9,6 @@ location: Global
 summary: >
   Proprietär plattform för delning, lagring och hantering av kod,
   med tillhörande funktioner för samarbeten kring projekt.
-access: >
-  Många funktioner kräver ett konto, men att skapa ett konto är kostnadsfritt.
-  KTH Biblioteket och andra KTH-enheter har institutionella förråd.
 link: https://github.com/KTH-Library
 link_requires_login: false
 rating:
@@ -37,8 +34,9 @@ rating:
 
 ## Åtkomst
 
-Skapa ett personligt konto och be ägaren till aktuell KTH-organisation lägga
-till dig. Privata repositorier ingår utan kostnad för akademisk användning.
+Många funktioner kräver ett konto, men att skapa ett konto är kostnadsfritt.
+KTH Biblioteket och andra KTH-enheter har institutionella förråd.
+Privata repositorier ingår utan kostnad för akademisk användning.
 
 ## Guider
 

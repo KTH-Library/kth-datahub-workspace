@@ -3,14 +3,12 @@ name: Zenodo
 icon: material/database-arrow-up
 provider: CERN / EU
 group: FAIR
-type: Publication
+type: service
 data: Open data
 location: EU
 summary: >
    General-purpose repository for publishing datasets, software and other
    research output with a DOI.
-access: >
-  Open to anyone; log in with ORCID, GitHub or a Zenodo account.
 link: https://zenodo.org
 link_requires_login: false
 rating:
@@ -25,8 +23,9 @@ rating:
 
 ## Access
 
-No agreement or application needed. Uploads up to 50 GB per record are free;
-larger datasets can be requested.
+No agreement or application needed.
+Open to anyone; log in with ORCID, GitHub or a Zenodo account.
+Uploads up to 50 GB per record are free; larger datasets can be requested.
 
 ## Guides
 

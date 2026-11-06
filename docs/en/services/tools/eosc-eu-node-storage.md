@@ -3,15 +3,12 @@ name: EOSC EU Node storage
 icon: material/cloud-lock
 provider: EOSC
 group: Cloud services and compute
-type: Storage
+type: service
 data: Research data
 location: EU
 summary: >
    European Open Science Cloud storage and compute for project data, including
    Jupyter notebooks close to the data.
-access: >
-   Log in with your KTH account through the EOSC EU Node;
-   a free allocation is included.
 link: https://open-science-cloud.ec.europa.eu
 link_requires_login: true
 rating:

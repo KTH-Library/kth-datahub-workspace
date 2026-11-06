@@ -3,13 +3,12 @@ name: Dropbox
 icon: material/dropbox
 provider: Dropbox Inc.
 group: RDM
-type: Storage
+type: service
 data: Work material
 location: Global
 summary: >
    Commercial file sync and sharing, common in external collaborations but
    not covered by a central KTH agreement.
-access: Personal or project-funded subscription; no KTH-wide agreement.
 link: https://www.dropbox.com
 link_requires_login: false
 rating:

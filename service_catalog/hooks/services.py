@@ -291,6 +291,8 @@ def _parse_service(path: str, docs_dir: str) -> dict | None:
             else "service"
         ),
         "summary": meta.get("summary") or MISSING,
+        # I don't think the "access" field fills any purpose in the YAML header
+        # since we already have "## Access" section header in each service.
         "access": meta.get("access") or MISSING,
         "link": meta.get("link") or meta.get("url") or "",
         "button_text": str(meta.get("button_text") or meta.get("button_label") or "").strip(),

@@ -9,8 +9,6 @@ location: Global
 summary: >
    Kommersiell fildelning som är vanlig i externa samarbeten men saknar centralt
    KTH-avtal.
-access: >
-   Personligt eller projektfinansierat abonnemang; inget KTH-övergripande avtal.
 link: https://www.dropbox.com
 link_requires_login: false
 rating:

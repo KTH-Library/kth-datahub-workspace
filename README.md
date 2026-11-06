@@ -11,12 +11,12 @@ support at KTH, built with MkDocs and deployed to GitHub Pages.
 
 ## How to contribute
 
-- If you only have small text contributions (e.g., additions, corrections),
-  we suggest you (in order of increasing required technical know-how):
++ If you only have small text contributions (e.g., additions, corrections),
+  we suggest (in order of increasing required technical know-how) that you either:
   1. propose your changes by using the built-in editing function here on Github (described below), or
   2. [open an issue](../../issues), or
   3. [create a pull request](../../pulls) ([how?](https://github.blog/developer-skills/github/beginners-guide-to-github-creating-a-pull-request)).
-- If you want to preview your changes, follow the instructions in
++ If you want to preview your changes, follow the instructions in
   the [Local development section](#local-development) below.
 
 
@@ -85,8 +85,8 @@ unless you are also contributing changes to the site's configuration, structure 
 
 Requirements:
 
-- Python >=3.12
-- `uv`
++ Python >=3.12
++ `uv`
 
 Install `uv`:
 <https://docs.astral.sh/uv/getting-started/installation>
@@ -139,16 +139,16 @@ facilitated by the fact that the core of VSCode is freely licensed software).
 For the traditional workflow, you may follow these steps (but please note that you
 can find far many better guides on the web):
 
-- Make sure you have a GitHub account.
-- Open [this repository](#).
-- Click the "Fork" button in the top-right corner to create a copy of the repository in your account.
-- Open your fork of the repository and clone it to your computer.
-- Optionally, create a new branch for your changes.
-- Make the necessary updates or edits.
-- Commit your changes.
-- Push the changes to your fork.
-- Submit a pull request from your fork to this repository.
-- Wait for your pull request to be reviewed and merged by us.
++ Make sure you have a GitHub account.
++ Open [this repository](#).
++ Click the "Fork" button in the top-right corner to create a copy of the repository in your account.
++ Open your fork of the repository and clone it to your computer.
++ Optionally, create a new branch for your changes.
++ Make the necessary updates or edits.
++ Commit your changes.
++ Push the changes to your fork.
++ Submit a pull request from your fork to this repository.
++ Wait for your pull request to be reviewed and merged by us.
 
 
 ## How this site is deployed

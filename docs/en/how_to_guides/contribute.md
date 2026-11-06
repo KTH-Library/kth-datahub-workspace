@@ -12,13 +12,13 @@ Don't be shy - [create an issue](https://github.com/KTH-Library/kth-digital-rese
 your contribution, question or bug report!
 
 Contributions will naturally be subject to review by the Datahub team before incorporation
-on this workspace.
+on this Workspace.
 
 We plan to offer more ways to submit your contributions in the near future - if you
 have any suggestions on how we should receive contributions, please let us know.
 
 
-### How to add an article or guide to the Workspace
+## How to add an article or guide to the Workspace
 
 1. Create your Markdown file in a suitable folder under `docs/en/`
    (we will assume you are writing an English-language text, but the same applies
@@ -42,3 +42,19 @@ On GitHub, create a pull request from your branch to ours.
 
 N.B. this Workspace uses the [MkDocs site generator](https://www.mkdocs.org/user-guide/writing-your-docs)
 under the hood.
+
+
+## How to add a card to the Service catalogue
+
+Create a Markdown file in a suitable folder under the `docs/en/services/` tree
+(we will assume you are writing an English-language text, but the same applies
+for your Swedish-language text).
+
+What makes the Markdown file a "Service Card" is the existence of at least the following
+fields in its YAML header: `name`, `group`, `provider`, and `summary`.
+Other fields are optional.
+
+Create and fill out the sections `## Access`, `## Guides`, and `## About`
+(this is not a hard rule - adjust the number and wording of rubrics if necessary).
+
+For a complete example and more technical details, see the [`service_catalog/README.md`](https://github.com/KTH-Library/kth-datahub-workspace/blob/master/service_catalog/README.md#adding-a-card-service-guide-checklist-support).

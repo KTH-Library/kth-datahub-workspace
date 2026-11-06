@@ -9,9 +9,6 @@ location: National
 summary: >
   Digital samarbetsplattform baserad på Nextcloud (öppen källkod) driftad
   av SUNET (en del av Vetenskapsrådet).
-access: >
-  Full tillgång kräver ett avtal mellan universitetet och SUNET, men tjänsten
-  är ändå tillgänglig men lagringen är begränsad till 25 MB.
 link: https://drive.sunet.se
 link_requires_login: false
 rating:
@@ -29,6 +26,8 @@ rating:
 
 ## Åtkomst
 
+Full tillgång kräver ett avtal mellan universitetet och SUNET, men tjänsten
+är ändå tillgänglig men lagringen är begränsad till 25 MB.
 Logga in med ditt KTH-konto.
 
 ## Guider

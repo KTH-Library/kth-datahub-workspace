@@ -3,15 +3,12 @@ name: GitHub
 icon: material/github
 provider: Microsoft
 group: RDM
-type: Versioning
+type: service
 data: Code
 location: Global
 summary: >
   Proprietary code forge and developer platform that allows anyone to
   create an account and store, manage, and share their code.
-access: >
-  Many functions require an account, but creating an account is free of cost.
-  KTH Library and other KTH organisations maintain institutional repositories.
 link: https://github.com/KTH-Library
 link_requires_login: false
 rating:
@@ -35,8 +32,11 @@ rating:
 
 ## Access
 
+Many functions require an account, but creating an account is free of cost.
 Create a personal account and ask the relevant KTH organisation owner to add
 you. Private repositories are included at no cost for academic use.
+
+KTH Library and other KTH organisations maintain institutional repositories.
 
 ## Guides
 

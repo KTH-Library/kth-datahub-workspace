@@ -60,23 +60,44 @@ You **do not** need to register them in the `nav` dict in `mkdocs.yml`.
 
 ```yaml
 ---
-name: Zenodo Research Storage
-type: service              # service, guide, checklist, or support
-provider: CERN
+name: Zenodo
+# group - free-text, but try to follow pre-existing spelling etc.
 group: Research Data Storage
+# provider - free-text, but try to follow pre-existing spelling etc.
+provider: CERN
+# summary - free-text, may be multiple paragraphs.
+summary: General-purpose data repository.
+# icon - any Material icon path [optional]
+# search the icon database https://squidfunk.github.io/mkdocs-material/reference/icons-emojis/#search
+icon: material/database-arrow-up
+# type - expected values: service, guide, checklist, support [optional]
+type: service
+# data - free-text, describes the kind of data handled by the service [optional]
+data: open data
+# tags - list of tags [optional]
 tags:
   - Open Access
   - DOI
   - FAIR Data
-last_updated: 2026-10-04    # YYYY-MM-DD: sets publication date in RSS feeds
-link: https://zenodo.org    # Always link to a webpage (avoid direct mailto:)
-button_text: Open service  # Optional: overrides default button label
+# location - free-text, geographical location [optional]
+location: EU
+# last_updated - date in YYYY-MM-DD format, sets publication date in RSS feed [optional]
+last_updated: 2026-10-04
+# link - URL, please always link to a webpage (avoid mailto:) [optional]
+link: https://zenodo.org
+# link_requires_login - boolean [optional]
+link_requires_login: false
+# button_text - verrides the default button text [optional]
+button_text: Open service
+# related - list of related service cards (using their filename!) [optional]
+# bi-directional, creates "related" links in both directions
 related:
-  - kth-onedrive           # Bi-directional: links both cards automatically
-rating:                    # Traffic light assessment (optional)
+  - kth-onedrive
+# rating - traffic-light assessment [optional]
+rating:
   legal:
     status: green
-    note: GDPR compliant within the EU
+    note: GDPR-compliant within the EU
   ip:
     status: green
   security:
@@ -94,16 +115,16 @@ A brief summary displayed on the card face in the catalogue grid. Keep this to 1
 
 ## About the service
 
-Every second-level heading (`##`) automatically becomes a collapsible accordion section
-inside the details modal.
+Every second-level heading (`##`) inside the details modal automatically becomes
+a collapsible accordion section.
 
 Standard Markdown tables are fully supported inside any section:
 
-| Feature | Details | Supported |
-| :--- | :--- | :---: |
-| Maximum upload | 50 GB per dataset | Yes |
-| Persistent ID | Automatic DOI minting | Yes |
-| Versioning | GitHub release integration | Yes |
+| Feature        | Details                    | Supported |
+| :---           | :---                       | :---:     |
+| Maximum upload | 50 GB per dataset          | Yes       |
+| Persistent ID  | Automatic DOI minting      | Yes       |
+| Versioning     | GitHub release integration | Yes       |
 
 ## Architecture
 
@@ -118,81 +139,34 @@ Images are supported and will automatically scale responsively inside the modal:
 - Upload your dataset and complete the required metadata fields.
 ```
 
-
-## How to add a new service (old instructions)
-<!-- these are the old instructions, check that nothing is lost
-then merge them with the new "Adding a card" instructions above -->
-
-1. Create `docs/en/services/<slug>.md` **and** `docs/sv/services/<slug>.md`
-   (same filename in both languages — the filename is the service id).
-2. Copy the front matter from an existing service and fill in `name`,
-   `provider`, `group`, `type`, `data`, `location`, `summary`, `access`,
-   `link`, `link_requires_login`, `icon`.
-3. Write the sections: `## Access` / `## Guides` / `## About the service`
-   (Swedish: `## Åtkomst` / `## Guider` / `## Om tjänsten`).
-4. Run `mkdocs serve` and check the card, the tags and the modal.
-
-Nothing else needs editing: the card, the dropdown options, the tags and the
-published service page are all generated. Leave a field out and it shows as
-*uppgift saknas* instead of disappearing — that is intentional.
-
 Rules that follow from our implementation:
 
 * The **filename** becomes the service id (`zenodo.md` → `zenodo`), which is
-  used in element ids and in the `?service=` URL parameter.
+  used in element IDs and in the `?service=` URL parameter.
 * Content **before the first `##`** is ignored; the card text comes from
-  `summary`.
-* Each `##` section becomes one expandable block in the modal, in file order.
+  the YAML `summary` field.
+* Each `##` section becomes one expandable block in the modal, in the same
+  order defined in the Markdown file.
 * A missing required field does not break the build; it is logged and rendered
-  as *uppgift saknas* so the gap is visible rather than silently hidden.
-* `index.md` and files starting with `_` are never treated as services.
+  as *uppgift saknas* so the gap is visible rather than silently hidden
+  (unless you build with the `--strict` flag set).
+* `index.md` and filenames starting with an underscore are never treated as services.
 
 
-### An example service (with comments)
+## How to specify which YAML fields become treated as tags
 
-```markdown
----
-name: Zenodo                           # required
-icon: material/database-arrow-up       # any Material icon path
-provider: CERN / EU                    # required — tag + dropdown
-group: FAIR-resurser                   # required — tag + dropdown
-type: Publicering                      # tag + dropdown
-data: Öppna data                       # tag only (no dropdown)
-location: EU                           # tag only (no dropdown)
-summary: >
-  General-purpose open repository      # required — card text,
-  developed under the European         # can be multi-line (YAML syntax)
-  OpenAIRE program and operated
-  by CERN.
-access: Open to anyone…                # searchable, shown in the card data
-link: https://zenodo.org
-link_requires_login: false
----
+Let's assume you want to add a field `license` and make it behave as a tag:
 
-## Access
-…
-## Guides
-1. …
-## About the service
-…
-```
+1. Add the field to to `TAG_GROUPS` in `services.py`.
+2. Add `.svc-tag--license { … }` plus a `[data-md-color-scheme="slate"]` override in `services.css`.
+
+Without a drop-down, clicking the tag falls back to a free-text search — which
+is usually what you want for a secondary facet.
 
 
-## How to add new tags or categories
+### How to extend filtering
 
-* **A new value** for an existing key (a new provider, group or type): just use
-  it in a service file. The dropdown option appears automatically.
-* **A new tag family** (for example `license`):
-  1. add `("license", "license")` to `TAG_GROUPS` in `services.py`;
-  2. add `.svc-tag--license { … }` plus a `[data-md-color-scheme="slate"]`
-     override in `services.css`.
-  Without a dropdown, clicking the tag falls back to a free-text search — which
-  is usually what you want for a secondary facet.
-
-
-## How to extend filtering
-
-To promote a tag family to a real dropdown:
+To promote a tag family to a real drop-down:
 
 1. In `services.py`, render the `<select name="license">` in `_filters_html()`
    (use `_options()`), and add `data-license="{_attr(_slug(...))}"` in
@@ -204,7 +178,7 @@ To promote a tag family to a real dropdown:
 3. Add the label strings to both entries in `LABELS`.
 
 
-## How to modify styling
+### How to modify styling
 
 Edit `docs/stylesheets/service_catalog/services.css`. Use Material's CSS
 variables rather than literal colours so light and dark mode both work. Keep

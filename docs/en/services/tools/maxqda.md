@@ -8,17 +8,12 @@ icon: material/layers-search
 # VERBI Software, Germany
 provider: VERBI GmbH
 group: Desktop software
-type: Analysis
+type: service
 data: Qualitative data
 location: EU
 summary: >
    MaxQDA is a computer-assisted qualitative data analysis application used for
    qualitative and mixed methods research.
-access: >
-  Personal or project-funded subscription required. No license nor support via KTH.
-  This proprietary software needs to be installed and run locally on your computer.
-  Only supports Windows and macOS. If your computer runs Linux, we suggest a virtual
-  machine such as [Winboat](https://www.winboat.app).
 link: https://www.maxqda.com
 link_requires_login: false
 rating:
@@ -35,7 +30,13 @@ rating:
 
 ## Access
 
-KTH does **not** offer a license nor support for MaxQDA.
+Personal or project-funded subscription required.
+KTH does **not** offer license nor support.
+
+This proprietary software needs to be installed and run locally on your computer.
+Only supports Windows and macOS. If your computer runs Linux, we suggest running it
+in a container/VM, e.g., using [Winboat](https://www.winboat.app).
+
 To buy a license for MaxQDA or its add-ons you must pay their annual subscription.
 
 

@@ -16,7 +16,7 @@ har några förslag på hur vi bör ta emot bidrag, tveka inte att höra av dig.
 
 
 
-### Så här lägger du till en artikel eller guide till Workspacet
+## Så här lägger du till en artikel eller guide till Workspacet
 
 1. Skapa din Markdown-fil i en lämplig mapp under `docs/sv/`
    (vi antar att du skriver en svenskspråkig text, men detsamma gäller
@@ -40,3 +40,17 @@ På GitHub skapar du sedan en *pull request* från din *branch* till vår.
 
 Obs! Detta Workspace använder [MkDocs webbplatsgenerator](https://www.mkdocs.org/user-guide/writing-your-docs)
 under huven.
+
+
+## Så här skapar du ett tjänstekort i tjänstekatalogen
+
+Skapa en Markdown-fil i en valfri mapp under `docs/sv/services/`
+(vi antar att du skriver en text på svenska, men detsamma gäller för din engelska text).
+
+Det som förvandlar Markdown-filen till ett "tjänstekort" är att dess YAML-huvud
+innehåller minst följande fält: `name`, `group`, `provider` och `summary`.
+Övriga fält i YAML-huvudet är frivilliga.
+
+Skapa och fyll ut sektionerna `## Åtkomst`, `## Guider` och `## Om tjänsten`.
+
+För ett komplett exempel och mer tekniska detaljer, se [`service_catalog/README.md`](https://github.com/KTH-Library/kth-datahub-workspace/blob/master/service_catalog/README.md#adding-a-card-service-guide-checklist-support).

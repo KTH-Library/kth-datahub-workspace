@@ -1,4 +1,4 @@
-# Digital services overview
+# Digital services
 
 An overview of digital services that researchers at KTH can use for storing,
 computing on, sharing and publishing research material. Search freely, filter by
@@ -14,6 +14,8 @@ are described the same way for all providers.
 
 !!! info "Add a service"
 
-    Every service is one markdown file in `docs/en/services/`.
-    Adding a file there is enough — the card, tags, filters and the service page
-    are generated automatically.
+    Each service card is contained in a single Markdown file in the `docs/en/services/` tree.
+    [To add a new service to this catalogue](../how_to_guides/contribute.md#how-to-add-a-card-to-the-service-catalogue),
+    all you have to do is add a properly formatted Markdown file somewhere in that tree.
+    The card itself, its tags, filters and other accoutrements are generated automatically
+    when the site is rebuilt.

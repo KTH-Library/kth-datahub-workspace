@@ -4,15 +4,13 @@ icon: material/layers-search
 # Lumivero since 2022, before that the company was known as QSR International
 provider: Lumivero
 group: Cloud services and compute
-type: Analysis
+type: service
 data: Qualitative data
 location: Global
 summary: >
   Nvivo is a computer-assisted qualitative data analysis software which is
   used in the social sciences as well as fields such as forensics, tourism,
   and marketing.
-access: >
-  Personal or project-funded subscription required. No license nor support via KTH.
 link: https://lumivero.com/products/nvivo
 link_requires_login: false
 rating:
@@ -29,8 +27,8 @@ rating:
 
 ## Access
 
+Personal or project-funded subscription required.
 KTH does **not** offer a license nor support for Nvivo.
-
 
 
 ## Guides
@@ -44,7 +42,6 @@ so I will not spend too much time researching user guides and such.
   Research Guide: Nvivo, by University of Maryland Libraries
 + <https://www.youtube.com/channel/UCnfY7xiVmjJ-y0Y3cFN0MJw>  
   Nvivo official YouTube channel
-
 
 
 ## About the software

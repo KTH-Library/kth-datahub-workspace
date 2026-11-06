@@ -1,4 +1,4 @@
-# Översikt digitala verktyg
+# Digitala tjänster
 
 En översikt över digitala tjänster som forskare vid KTH kan använda för att
 lagra, beräkna, dela och publicera forskningsmaterial. Sök fritt, filtrera på
@@ -14,6 +14,8 @@ prislista, och risker beskrivs på samma sätt för alla leverantörer.
 
 !!! info "Lägg till en tjänst"
 
-    Varje tjänst är en markdownfil i `docs/sv/services/`.
-    Det räcker att lägga filen där — kort, taggar, filter och tjänstesida
-    skapas automatiskt.
+    Varje tjänstebeskrivning utgörs av en Markdown-fil under `docs/sv/services/`.
+    [För att lägga till en ny tjänst i katalogen](../how_to_guides/contribute.md#sa-har-skapar-du-ett-tjanstekort-i-tjanstekatalogen)
+    behöver du bara skapa en korrekt formaterad Markdown-fil någonstans i mappträdet.
+    Själva tjänstekortet, dess taggar, filter och övriga visuella element
+    genereras automatiskt av sajtens "build"-skript.

@@ -9,8 +9,6 @@ location: EU
 summary: >
   Personlig och delad molnlagring som ingår i KTH:s Microsoft 365-avtal,
   lämplig för löpande arbetsmaterial.
-access: >
-  Tillgänglig för alla anställda och studenter med KTH-konto.
 link: https://intra.kth.se/it/lagring
 link_requires_login: false
 rating:
@@ -36,6 +34,7 @@ rating:
 
 Logga in med ditt KTH-konto. Ingen ansökan och ingen extra kostnad för den
 enskilda forskaren, eftersom tjänsten ingår i det centrala avtalet.
+Tillgänglig för alla anställda och studenter med KTH-konto.
 
 ## Guider
 
