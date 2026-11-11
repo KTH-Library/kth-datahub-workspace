@@ -5,8 +5,8 @@ provider: KTH Library & IT
 type: support
 group: RDM
 summary: Tailored one-on-one advisory on Data Management Plans (DMPs), secure storage options, compliance, and archiving.
-email: researchdata@kth.se
-
+# email is not a supported field, don't know how it snuck in here
+# email: researchdata@kth.se
 related: [kth-onedrive, zenodo]
 ---
 

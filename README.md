@@ -122,7 +122,6 @@ CI build pipeline (to avoid surprises):
 uv run mkdocs build --clean --strict -v
 ```
 
-
 ## Other ways to contribute
 
 If you spot a typo, error, or want to add more information, feel free to contribute, we welcome all contributions to the KTH Data Hub Workspace.
